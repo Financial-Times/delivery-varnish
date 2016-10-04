@@ -1,4 +1,4 @@
-## CoCo Varnish
+## UPP Delivery Varnish
 
 The Varnish caching proxy placed above api-policy-component.
 
