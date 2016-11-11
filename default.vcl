@@ -9,9 +9,14 @@ backend default {
     .port = "VARNISH_BACKEND_PORT";
 }
 
-backend notifications_push {
+backend content_notifications_push {
   .host = "VARNISH_BACKEND_HOST";
-  .port = "NOTIFICATIONS_PUSH_PORT";
+  .port = "CONTENT_NOTIFICATIONS_PUSH_PORT";
+}
+
+backend list_notifications_push {
+  .host = "VARNISH_BACKEND_HOST";
+  .port = "LIST_NOTIFICATIONS_PUSH_PORT";
 }
 
 sub vcl_recv {
@@ -37,8 +42,10 @@ sub vcl_recv {
     	    # Client has exceeded 2 reqs per 1s
     	    return (synth(429, "Too Many Requests"));
         }
-    } elseif (req.url ~ "^\/(content|lists)\/notifications-push.*$") {
-        set req.backend_hint = notifications_push;
+    } elseif (req.url ~ "^\/content\/notifications-push.*$") {
+        set req.backend_hint = content_notifications_push;
+    } elseif (req.url ~ "^\/lists\/notifications-push.*$") {
+        set req.backend_hint = list_notifications_push;
         # Routing preset here as vulcan is unable to route on query strings
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
         set req.http.Host = "public-content-by-concept-api";
