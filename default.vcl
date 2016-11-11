@@ -92,6 +92,10 @@ sub vcl_backend_response {
             return(retry);
         }
     }
+
+    if (beresp.status == 301 && ((beresp.http.cache-control !~ "s-maxage") || (beresp.http.cache-control !~ "max-age"))){
+        set beresp.ttl = 31536000s;
+    }
 }
 
 sub vcl_deliver {
