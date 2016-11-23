@@ -19,9 +19,21 @@ backend list_notifications_push {
   .port = "LIST_NOTIFICATIONS_PUSH_PORT";
 }
 
+acl purge {
+    "localhost";
+}
+
 sub vcl_recv {
     # Remove all cookies; we don't need them, and setting cookies bypasses varnish caching.
     unset req.http.Cookie;
+
+    # allow PURGE from localhost
+    if (req.method == "PURGE") {
+        if (!client.ip ~ purge) {
+            return(synth(405,"Not allowed."));
+        }
+        return (purge);
+    }
 
     if (req.url ~ "^\/robots\.txt$") {
         return(synth(200, "robots"));
