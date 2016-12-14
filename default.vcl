@@ -61,6 +61,8 @@ sub vcl_recv {
         # Routing preset here as vulcan is unable to route on query strings
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
         set req.http.Host = "public-content-by-concept-api";
+    } elseif (req.url ~ "\/concept\/search.*$") {
+        set req.http.Host = "concept-search-api";
     }
 
     if (!basicauth.match("/.htpasswd",  req.http.Authorization)) {
