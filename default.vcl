@@ -63,7 +63,7 @@ sub vcl_recv {
         set req.http.Host = "public-content-by-concept-api";
     }
 
-    if (!basicauth.match("/etc/varhish/auth/.htpasswd",  req.http.Authorization)) {
+    if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
         return(synth(401, "Authentication required"));
     }
 
