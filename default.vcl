@@ -80,7 +80,10 @@ sub vcl_recv {
         	  return (synth(429, "Too Many Requests"));
       }
     }
-    unset req.http.Authorization;
+
+    if (req.url !~ "^\/(content|lists)\/notifications-push.*$") {
+      unset req.http.Authorization;
+    }
 }
 
 sub vcl_synth {
