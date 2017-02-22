@@ -19,6 +19,11 @@ backend list_notifications_push {
   .port = "LIST_NOTIFICATIONS_PUSH_PORT";
 }
 
+backend health_check_service {
+  .host = "upp-aggregate-healthcheck";
+  .port = "8080";
+}
+
 acl purge {
     "localhost";
 }
@@ -40,7 +45,7 @@ sub vcl_recv {
     }
 
     if ((req.url ~ "^\/__health.*$") || (req.url ~ "^\/__gtg.*$")) {
-        set req.http.Host = "aggregate-healthcheck";
+        req.backend_hint = health_check_service;
         return (pass);
     } elseif ((req.url ~ "^.*\/__health.*$") || (req.url ~ "^.*\/__gtg.*$")) {
         return (pass);
