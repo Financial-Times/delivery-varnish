@@ -44,7 +44,7 @@ sub vcl_recv {
         return(synth(200, "robots"));
     }
 
-    if ((req.url ~ "^\/__health.*$") || (req.url ~ "^\/__gtg.*$")) {
+    if ((req.url ~ "^\/__health.*$") || (req.url ~ "^\/__gtg.*$") || (req.url ~ "^\/__pods-health.*$") || (req.url ~ "^\/add-ack-form.*$")) {
         set req.backend_hint = health_check_service;
         return (pass);
     } elseif ((req.url ~ "^.*\/__health.*$") || (req.url ~ "^.*\/__gtg.*$")) {
