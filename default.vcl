@@ -45,7 +45,7 @@ sub vcl_recv {
     }
 
     if ((req.url ~ "^\/__health.*$") || (req.url ~ "^\/__gtg.*$")) {
-        req.backend_hint = health_check_service;
+        set req.backend_hint = health_check_service;
         return (pass);
     } elseif ((req.url ~ "^.*\/__health.*$") || (req.url ~ "^.*\/__gtg.*$")) {
         return (pass);
