@@ -54,7 +54,7 @@ sub vcl_recv {
     	    # Client has exceeded 2 reqs per 1s
     	    return (synth(429, "Too Many Requests"));
         }
-        # Routing preset here as vulcan is unable to route on query strings
+    # Routing preset here as vulcan is unable to route on query strings
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
         set req.http.Host = "public-content-by-concept-api";
     } elseif (req.url ~ "\/concept\/search.*$") {
