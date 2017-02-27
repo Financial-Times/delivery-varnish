@@ -54,10 +54,6 @@ sub vcl_recv {
     	    # Client has exceeded 2 reqs per 1s
     	    return (synth(429, "Too Many Requests"));
         }
-    } elseif (req.url ~ "^\/content\/notifications-push.*$") {
-        set req.backend_hint = content_notifications_push;
-    } elseif (req.url ~ "^\/lists\/notifications-push.*$") {
-        set req.backend_hint = list_notifications_push;
         # Routing preset here as vulcan is unable to route on query strings
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
         set req.http.Host = "public-content-by-concept-api";
@@ -81,6 +77,13 @@ sub vcl_recv {
       }
     }
     unset req.http.Authorization;
+    if (req.url ~ "^\/content\/notifications-push.*$") {
+        set req.backend_hint = content_notifications_push;
+        return (pass);
+    } elseif (req.url ~ "^\/lists\/notifications-push.*$") {
+        set req.backend_hint = list_notifications_push;
+        return (pass);
+    }
 }
 
 sub vcl_synth {
