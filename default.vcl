@@ -5,23 +5,33 @@ import basicauth;
 
 # Default backend definition. Set this to point to your content server.
 backend default {
-    .host = "VARNISH_BACKEND_HOST";
-    .port = "VARNISH_BACKEND_PORT";
+    .host = "api-policy-component";
+    .port = "8080";
 }
 
 backend content_notifications_push {
-  .host = "VARNISH_BACKEND_HOST";
-  .port = "CONTENT_NOTIFICATIONS_PUSH_PORT";
+  .host = "notifications-push";
+  .port = "8080";
 }
 
 backend list_notifications_push {
-  .host = "VARNISH_BACKEND_HOST";
-  .port = "LIST_NOTIFICATIONS_PUSH_PORT";
+  .host = "list-notifications-push";
+  .port = "8080";
 }
 
 backend health_check_service {
   .host = "upp-aggregate-healthcheck";
   .port = "8080";
+}
+
+backend public_content_by_concept_api {
+  .host = "public-content-by-concept-api";
+  .port = "8080";
+}
+
+backend internal_apps_routing_varnish {
+  .host = "path-routing-varnish";
+  .port = "80";
 }
 
 acl purge {
@@ -44,14 +54,9 @@ sub vcl_recv {
         return(synth(200, "robots"));
     }
 
-    if ((req.url ~ "^\/__health.*$") || (req.url ~ "^\/__gtg.*$") || (req.url ~ "^\/__pods-health.*$") || (req.url ~ "^\/add-ack-form.*$")) {
+    if (req.url ~ "^\/__health.*$") {
         set req.backend_hint = health_check_service;
         return (pass);
-    } elseif ((req.url ~ "^.*\/__health.*$") || (req.url ~ "^.*\/__gtg.*$")) {
-        return (pass);
-    } elseif (!req.url ~ "^\/__[\w-]*\/.*$") {
-        set req.http.Host = "HOST_HEADER";
-        set req.http.X-VarnishPassThrough = "true";
     }
 
     if (req.url ~ "^\/content-preview.*$") {
@@ -65,11 +70,17 @@ sub vcl_recv {
         set req.backend_hint = list_notifications_push;
         # Routing preset here as vulcan is unable to route on query strings
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
-        set req.http.Host = "public-content-by-concept-api";
+        set req.backend_hint = public_content_by_concept_api;
     }
 
     if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
         return(synth(401, "Authentication required"));
+    }
+
+    # We need authentication for internal apps, and no caching. This is why this line is after checking the authentication.
+    if (req.url ~ "^\/__[\w-]*\/.*$") {
+        set req.backend_hint = internal_apps_routing_varnish;
+        return (pipe);
     }
 
     #This checks if the user is a known B2B user and is trying to access the notifications-push endpoint.
