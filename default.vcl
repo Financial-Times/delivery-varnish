@@ -77,12 +77,6 @@ sub vcl_recv {
         return(synth(401, "Authentication required"));
     }
 
-    # We need authentication for internal apps, and no caching. This is why this line is after checking the authentication.
-    if (req.url ~ "^\/__[\w-]*\/.*$") {
-        set req.backend_hint = internal_apps_routing_varnish;
-        return (pipe);
-    }
-
     #This checks if the user is a known B2B user and is trying to access the notifications-push endpoint.
     #If the B2B client calls another endpoint, other than notification-push, return 403 Forbidden
     if (req.http.Authorization ~ "^Basic QjJC[a-zA-Z0-9=]*") {
@@ -94,7 +88,14 @@ sub vcl_recv {
         	  return (synth(429, "Too Many Requests"));
       }
     }
+
     unset req.http.Authorization;
+    # We need authentication for internal apps, and no caching, and the authentication should not be passed to the internal apps.
+    # This is why this line is after checking the authentication and unsetting the authentication header.
+    if (req.url ~ "^\/__[\w-]*\/.*$") {
+        set req.backend_hint = internal_apps_routing_varnish;
+        return (pass);
+    }
 }
 
 sub vcl_synth {
