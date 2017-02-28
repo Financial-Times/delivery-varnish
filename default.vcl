@@ -94,7 +94,7 @@ sub vcl_recv {
     # This is why this line is after checking the authentication and unsetting the authentication header.
     if (req.url ~ "^\/__[\w-]*\/.*$") {
         set req.backend_hint = internal_apps_routing_varnish;
-        return (pass);
+        return (pipe);
     }
 }
 
