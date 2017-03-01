@@ -79,10 +79,10 @@ sub vcl_recv {
     unset req.http.Authorization;
     if (req.url ~ "^\/content\/notifications-push.*$") {
         set req.backend_hint = content_notifications_push;
-        return (pass);
+        return (pipe);
     } elseif (req.url ~ "^\/lists\/notifications-push.*$") {
         set req.backend_hint = list_notifications_push;
-        return (pass);
+        return (pipe);
     }
 }
 
