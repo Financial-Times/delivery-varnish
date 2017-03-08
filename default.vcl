@@ -54,11 +54,7 @@ sub vcl_recv {
     	    # Client has exceeded 2 reqs per 1s
     	    return (synth(429, "Too Many Requests"));
         }
-    } elseif (req.url ~ "^\/content\/notifications-push.*$") {
-        set req.backend_hint = content_notifications_push;
-    } elseif (req.url ~ "^\/lists\/notifications-push.*$") {
-        set req.backend_hint = list_notifications_push;
-        # Routing preset here as vulcan is unable to route on query strings
+    # Routing preset here as vulcan is unable to route on query strings
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
         set req.http.Host = "public-content-by-concept-api";
     } elseif (req.url ~ "\/concept\/search.*$") {
@@ -81,6 +77,13 @@ sub vcl_recv {
       }
     }
     unset req.http.Authorization;
+    if (req.url ~ "^\/content\/notifications-push.*$") {
+        set req.backend_hint = content_notifications_push;
+        return (pipe);
+    } elseif (req.url ~ "^\/lists\/notifications-push.*$") {
+        set req.backend_hint = list_notifications_push;
+        return (pipe);
+    }
 }
 
 sub vcl_synth {
@@ -122,4 +125,10 @@ sub vcl_deliver {
     } else {
         set resp.http.X-Cache = "MISS";
     }
+}
+
+sub vcl_pipe {
+    # http://www.varnish-cache.org/ticket/451
+    # This forces every pipe request to be the first one.
+    set bereq.http.connection = "close";
 }
