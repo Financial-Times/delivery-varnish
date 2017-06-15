@@ -39,6 +39,10 @@ sub vcl_recv {
         return(synth(200, "robots"));
     }
 
+    if ((!req.http.X-Original-Request-URL) && req.http.X-Forwarded-For && req.http.Host) {
+        set req.http.X-Original-Request-URL = "https://" + req.http.Host + req.url;
+    }
+
     if ((req.url ~ "^\/__health.*$") || (req.url ~ "^\/__gtg.*$")) {
         set req.http.Host = "aggregate-healthcheck";
         return (pass);
