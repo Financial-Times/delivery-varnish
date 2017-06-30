@@ -1,0 +1,19 @@
+# Default values for delivery-varnish.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+service:
+  name: "" # The name of the service, should be defined in the specific app-configs folder.
+  hasHealthcheck: "true"
+  certificateAwsArn: "" # The ARN of the aws certificate use by the ELB created for this service
+  htpasswdSecret: "varnish-auth" # The Kubernetes secret containing the contents of the .htpasswd file used for authentication.
+replicaCount: 2
+image:
+  repository: coco/delivery-varnish
+  pullPolicy: IfNotPresent
+elbRegistrator:
+  image: "coco/coco-elb-dns-registrator:k8s_v0.0.4"
+#resources:
+#  limits:
+#    memory: 256Mi
+
+

@@ -1,0 +1,21 @@
+##this is an example service.yaml that should be customized in order to meet the configuration for app service
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{.Values.service.name}} 
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{.Values.service.name}}
+    visualize: "true" 
+    hasHealthcheck: "{{ .Values.service.hasHealthcheck }}"
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "{{ .Values.service.certificateAwsArn }}"
+
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 443
+      targetPort: 80
+  selector:
+    app: {{ .Values.service.name }} 
