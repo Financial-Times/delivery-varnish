@@ -14,6 +14,11 @@ backend content_notifications_push {
   .port = "CONTENT_NOTIFICATIONS_PUSH_PORT";
 }
 
+backend content_notifications_push_api {
+  .host = "VARNISH_BACKEND_HOST";
+  .port = "CONTENT_NOTIFICATIONS_PUSH_API_PORT";
+}
+
 backend list_notifications_push {
   .host = "VARNISH_BACKEND_HOST";
   .port = "LIST_NOTIFICATIONS_PUSH_PORT";
@@ -58,6 +63,9 @@ sub vcl_recv {
     	    # Client has exceeded 2 reqs per 1s
     	    return (synth(429, "Too Many Requests"));
         }
+    } elseif (req.url ~ "^\/content\/notifications-push\?apiKey=.*" || req.http.X-API-KEY !~ "") {   
+        set req.backend_hint = content_notifications_push_api;
+        return (pass);
     } elseif (req.url ~ "^\/content\/notifications-push.*$") {
         set req.backend_hint = content_notifications_push;
     } elseif (req.url ~ "^\/lists\/notifications-push.*$") {
