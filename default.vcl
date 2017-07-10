@@ -63,7 +63,7 @@ sub vcl_recv {
     	    # Client has exceeded 2 reqs per 1s
     	    return (synth(429, "Too Many Requests"));
         }
-    } elseif ((req.url ~ "^\/content\/notifications-push\?apiKey=.*") || (req.url ~ "^\/content\/notifications-push.*$" && req.http.X-API-KEY !~ "")) {   
+    } elseif ((req.url ~ "^\/content\/notifications-push\?apiKey=.*") || (req.url ~ "^\/content\/notifications-push.*$" && req.http.X-API-KEY !~ "^$")) {
         set req.backend_hint = content_notifications_push_api;
     } elseif (req.url ~ "^\/content\/notifications-push.*$") {
         set req.backend_hint = content_notifications_push;
