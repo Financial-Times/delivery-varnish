@@ -76,7 +76,7 @@ sub vcl_recv {
         set req.http.Host = "concept-search-api";
     }
 
-    if((req.url !~ "^\/content\/notifications-push\?apiKey=.*") || (req.url !~ "^\/lists\/notifications-push\?apiKey=.*")) {
+    if(!(req.url ~ "^\/content\/notifications-push\?apiKey=.*" || req.url ~ "^\/lists\/notifications-push\?apiKey=.*")) {
       if (!basicauth.match("/.htpasswd",  req.http.Authorization)) {
           return(synth(401, "Authentication required"));
       }
