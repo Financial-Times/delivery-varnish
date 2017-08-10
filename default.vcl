@@ -9,11 +9,6 @@ backend default {
     .port = "VARNISH_BACKEND_PORT";
 }
 
-backend content_notifications_push {
-  .host = "VARNISH_BACKEND_HOST";
-  .port = "CONTENT_NOTIFICATIONS_PUSH_PORT";
-}
-
 backend content_notifications_push_api {
   .host = "VARNISH_BACKEND_HOST";
   .port = "CONTENT_NOTIFICATIONS_PUSH_API_PORT";
