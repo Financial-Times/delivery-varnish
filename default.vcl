@@ -86,6 +86,10 @@ sub vcl_recv {
     } elseif ((req.url ~ "^\/content\/notifications-push\?apiKey=.*") || (req.url ~ "^\/content\/notifications-push.*$" && req.http.X-API-KEY !~ "^$")) {
         set req.backend_hint = content_notifications_push_api;
     } elseif (req.url ~ "^\/content\/notifications-push.*$") {
+        # Forbid access via Fastly
+        if (req.http.Authorization ~ "^Basic cHVza[a-zA-Z0-9=]*") {
+            return (synth(403, "Forbidden"));
+        }
         set req.backend_hint = content_notifications_push;
     } elseif (req.url ~ "^\/lists\/notifications-push.*$") {
         set req.backend_hint = list_notifications_push;
