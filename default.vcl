@@ -68,7 +68,7 @@ sub vcl_recv {
         set req.http.X-Original-Request-URL = "https://" + req.http.Host + req.url;
     }
 
-    if ((req.url ~ "^\/__health.*$") || (req.url ~ "^\/__gtg.*$")) {
+    if ((req.url ~ "^\/__health.*$") || (req.url ~ "^\/__agghealth.*$") || (req.url ~ "^\/__gtg.*$")) {
         set req.http.Host = "aggregate-healthcheck";
         return (pass);
     } elseif ((req.url ~ "^.*\/__health.*$") || (req.url ~ "^.*\/__gtg.*$")) {
