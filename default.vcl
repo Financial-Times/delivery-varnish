@@ -89,20 +89,10 @@ sub vcl_recv {
         set req.http.Host = "concept-search-api";
     }
 
-    if(!(req.url ~ "^\/content\/notifications-push.*$" || req.url ~ "^\/lists\/notifications-push.*$")) {
-      if (!basicauth.match("/.htpasswd",  req.http.Authorization)) {
-          return(synth(401, "Authentication required"));
-      }
+    if (!basicauth.match("/.htpasswd",  req.http.Authorization)) {
+        return(synth(401, "Authentication required"));
     }
 
-    #This checks if the user is a known B2B user and is trying to access the notifications-push endpoint.
-    #If the B2B client calls another endpoint, other than notification-push, return 403 Forbidden
-    if (req.http.Authorization ~ "^Basic QjJC[a-zA-Z0-9=]*") {
-      if (vsthrottle.is_denied(client.identity, 2, 1s)) {
-        	  # Client has exceeded 2 reqs per 1s
-        	  return (synth(429, "Too Many Requests"));
-      }
-    }
     unset req.http.Authorization;
 }
 
