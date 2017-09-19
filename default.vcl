@@ -9,11 +9,6 @@ backend default {
     .port = "VARNISH_BACKEND_PORT";
 }
 
-backend content_notifications_push {
-  .host = "VARNISH_BACKEND_HOST";
-  .port = "CONTENT_NOTIFICATIONS_PUSH_PORT";
-}
-
 backend content_notifications_push_api {
   .host = "VARNISH_BACKEND_HOST";
   .port = "CONTENT_NOTIFICATIONS_PUSH_API_PORT";
@@ -83,14 +78,8 @@ sub vcl_recv {
     	    # Client has exceeded 2 reqs per 1s
     	    return (synth(429, "Too Many Requests"));
         }
-    } elseif ((req.url ~ "^\/content\/notifications-push\?apiKey=.*") || (req.url ~ "^\/content\/notifications-push.*$" && req.http.X-API-KEY !~ "^$")) {
-        set req.backend_hint = content_notifications_push_api;
     } elseif (req.url ~ "^\/content\/notifications-push.*$") {
-        # Forbid access via Fastly
-        if (req.http.Authorization ~ "^Basic cHVza[a-zA-Z0-9=]*") {
-            return (synth(403, "Forbidden"));
-        }
-        set req.backend_hint = content_notifications_push;
+        set req.backend_hint = content_notifications_push_api;
     } elseif (req.url ~ "^\/lists\/notifications-push.*$") {
         set req.backend_hint = list_notifications_push;
         # Routing preset here as vulcan is unable to route on query strings
@@ -104,17 +93,6 @@ sub vcl_recv {
         return(synth(401, "Authentication required"));
     }
 
-    #This checks if the user is a known B2B user and is trying to access the notifications-push endpoint.
-    #If the B2B client calls another endpoint, other than notification-push, return 403 Forbidden
-    if (req.http.Authorization ~ "^Basic QjJC[a-zA-Z0-9=]*") {
-      if (req.url !~ "^\/content\/notifications-push.*$") {
-              return (synth(403, "Forbidden"));
-      }
-      if (vsthrottle.is_denied(client.identity, 2, 1s)) {
-        	  # Client has exceeded 2 reqs per 1s
-        	  return (synth(429, "Too Many Requests"));
-      }
-    }
     unset req.http.Authorization;
 }
 
