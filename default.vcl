@@ -34,6 +34,11 @@ backend internal_apps_routing_varnish {
   .port = "80";
 }
 
+backend concept_search_api {
+  .host = "concept-search-api";
+  .port = "8080";
+}
+
 acl purge {
     "localhost";
 }
@@ -74,12 +79,16 @@ sub vcl_recv {
         return(synth(200, "robots"));
     }
 
+    if ((!req.http.X-Original-Request-URL) && req.http.X-Forwarded-For && req.http.Host) {
+        set req.http.X-Original-Request-URL = "https://" + req.http.Host + req.url;
+    }
+
     if ((req.url ~ "^\/__health.*$") || (req.url ~ "^\/__gtg.*$")) {
         set req.backend_hint = health_check_service;
         return (pass);
     }
 
-    if (req.url ~ "^\/content-preview.*$") {
+    if ((req.url ~ "^\/content-preview.*$") || (req.url ~ "^\/internalcontent-preview.*$")) {
         if (vsthrottle.is_denied(client.identity, 2, 1s)) {
     	    # Client has exceeded 2 reqs per 1s
     	    return (synth(429, "Too Many Requests"));
@@ -91,22 +100,12 @@ sub vcl_recv {
         # Routing preset here as vulcan is unable to route on query strings
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
         set req.backend_hint = public_content_by_concept_api;
+    } elseif (req.url ~ "\/concept\/search.*$") {
+        set req.backend_hint = concept_search_api;
     }
 
     if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
         return(synth(401, "Authentication required"));
-    }
-
-    #This checks if the user is a known B2B user and is trying to access the notifications-push endpoint.
-    #If the B2B client calls another endpoint, other than notification-push, return 403 Forbidden
-    if (req.http.Authorization ~ "^Basic QjJC[a-zA-Z0-9=]*") {
-      if (req.url !~ "^\/content\/notifications-push.*$") {
-              return (synth(403, "Forbidden"));
-      }
-      if (vsthrottle.is_denied(client.identity, 2, 1s)) {
-        	  # Client has exceeded 2 reqs per 1s
-        	  return (synth(429, "Too Many Requests"));
-      }
     }
 
     unset req.http.Authorization;
@@ -140,6 +139,10 @@ sub vcl_backend_response {
         if (bereq.retries < 2 ) {
             return(retry);
         }
+    }
+
+    if (beresp.status == 301 && ((beresp.http.cache-control !~ "s-maxage") || (beresp.http.cache-control !~ "max-age"))){
+        set beresp.ttl = 31536000s;
     }
 }
 
