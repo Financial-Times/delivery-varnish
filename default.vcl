@@ -6,12 +6,12 @@ import basicauth;
 # Default backend definition. Set this to point to your content server.
 backend default {
     .host = "api-policy-component";
-    .port = "8599";
+    .port = "8080";
 }
 
 backend content_notifications_push {
   .host = "notifications-push";
-  .port = "8080";
+  .port = "8599";
 }
 
 backend list_notifications_push {
