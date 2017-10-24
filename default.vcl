@@ -39,11 +39,6 @@ backend concept_search_api {
   .port = "8080";
 }
 
-backend empty {
-    .host = "";
-    .port = "";
-}
-
 acl purge {
     "localhost";
 }
@@ -98,9 +93,9 @@ sub vcl_recv {
     	    # Client has exceeded 2 reqs per 1s
     	    return (synth(429, "Too Many Requests"));
         }
-    } elseif ((req.url ~ "^\/content\/notifications-push.*$") || (req.url ~ "^\/__notifications-push/__health.*$")){
+    } elseif (req.url ~ "^\/content\/notifications-push.*$") {
         set req.backend_hint = content_notifications_push;
-    } elseif ((req.url ~ "^\/lists\/notifications-push.*$") || (req.url ~ "^\/__list-notifications-push/__health.*$")) {
+    } elseif (req.url ~ "^\/lists\/notifications-push.*$") {
         set req.backend_hint = list_notifications_push;
         # Routing preset here as vulcan is unable to route on query strings
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
@@ -116,7 +111,11 @@ sub vcl_recv {
     unset req.http.Authorization;
     # We need authentication for internal apps, and no caching, and the authentication should not be passed to the internal apps.
     # This is why this line is after checking the authentication and unsetting the authentication header.
-    if ((req.url ~ "^\/__[\w-]*\/.*$") && (req.backend_hint == empty)) {
+    if (req.url ~ "^\/__notifications-push/__health.*$") {
+        set req.backend_hint = content_notifications_push;
+    } elseif (req.url ~ "^\/__list-notifications-push/__health.*$") {
+        set req.backend_hint = list_notifications_push;
+    } elseif (req.url ~ "^\/__[\w-]*\/.*$") {
         set req.backend_hint = internal_apps_routing_varnish;
         return (pipe);
     }
