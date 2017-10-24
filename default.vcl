@@ -111,7 +111,7 @@ sub vcl_recv {
     unset req.http.Authorization;
     # We need authentication for internal apps, and no caching, and the authentication should not be passed to the internal apps.
     # This is why this line is after checking the authentication and unsetting the authentication header.
-    if ((req.url ~ "^\/__[\w-]*\/.*$") && (req.backend_hint == "")) {
+    if ((req.url ~ "^\/__[\w-]*\/.*$") && (req.backend_hint.host == "")) {
         set req.backend_hint = internal_apps_routing_varnish;
         return (pipe);
     }
