@@ -93,9 +93,9 @@ sub vcl_recv {
     	    # Client has exceeded 2 reqs per 1s
     	    return (synth(429, "Too Many Requests"));
         }
-    } elseif (req.url ~ "^\/content\/notifications-push.*$") {
+    } elseif ((req.url ~ "^\/content\/notifications-push.*$") || (req.url ~ "^\/__notifications-push/__health.*$")){
         set req.backend_hint = content_notifications_push;
-    } elseif (req.url ~ "^\/lists\/notifications-push.*$") {
+    } elseif ((req.url ~ "^\/lists\/notifications-push.*$") || (req.url ~ "^\/__list-notifications-push/__health.*$")) {
         set req.backend_hint = list_notifications_push;
         # Routing preset here as vulcan is unable to route on query strings
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
