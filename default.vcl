@@ -112,8 +112,10 @@ sub vcl_recv {
     # We need authentication for internal apps, and no caching, and the authentication should not be passed to the internal apps.
     # This is why this line is after checking the authentication and unsetting the authentication header.
     if (req.url ~ "^\/__notifications-push/__health.*$") {
+        set req.url = regsub(req.url, "^\/__[\w-]*\/(.*)$", "/\1");
         set req.backend_hint = content_notifications_push;
     } elseif (req.url ~ "^\/__list-notifications-push/__health.*$") {
+        set req.url = regsub(req.url, "^\/__[\w-]*\/(.*)$", "/\1");
         set req.backend_hint = list_notifications_push;
     } elseif (req.url ~ "^\/__[\w-]*\/.*$") {
         set req.backend_hint = internal_apps_routing_varnish;
