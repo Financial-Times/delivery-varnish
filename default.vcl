@@ -14,11 +14,6 @@ backend content_notifications_push {
   .port = "8599";
 }
 
-backend list_notifications_push {
-  .host = "list-notifications-push";
-  .port = "8549";
-}
-
 backend health_check_service {
   .host = "upp-aggregate-healthcheck";
   .port = "8080";
@@ -95,8 +90,6 @@ sub vcl_recv {
         }
     } elseif (req.url ~ "^\/content\/notifications-push.*$") {
         set req.backend_hint = content_notifications_push;
-    } elseif (req.url ~ "^\/lists\/notifications-push.*$") {
-        set req.backend_hint = list_notifications_push;
         # Routing preset here as vulcan is unable to route on query strings
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
         set req.backend_hint = public_content_by_concept_api;
@@ -114,9 +107,6 @@ sub vcl_recv {
     if (req.url ~ "^\/__notifications-push/__health.*$") {
         set req.url = regsub(req.url, "^\/__[\w-]*\/(.*)$", "/\1");
         set req.backend_hint = content_notifications_push;
-    } elseif (req.url ~ "^\/__list-notifications-push/__health.*$") {
-        set req.url = regsub(req.url, "^\/__[\w-]*\/(.*)$", "/\1");
-        set req.backend_hint = list_notifications_push;
     } elseif (req.url ~ "^\/__[\w-]*\/.*$") {
         set req.backend_hint = internal_apps_routing_varnish;
         return (pipe);
