@@ -1,5 +1,5 @@
 # Values used for the deployed application.
-replicaCount: 2
 service:
   name: delivery-varnish
-  certificateAwsArn: "arn:aws:iam::027104099916:server-certificate/wildcard.ft.com"
+  # Apply the certificate from content test by default
+  certificateAwsArn: "arn:aws:acm:eu-west-1:070529446553:certificate/53071112-759c-4875-97e2-c62425df1381"

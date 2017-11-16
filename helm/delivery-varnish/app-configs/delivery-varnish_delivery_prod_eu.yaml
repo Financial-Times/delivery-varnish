@@ -1,0 +1,4 @@
+# Values used for the deployed application.
+service:
+  name: delivery-varnish
+  certificateAwsArn: "arn:aws:acm:eu-west-1:469211898354:certificate/4e431fdf-0a66-436a-a998-37dd61307447"
