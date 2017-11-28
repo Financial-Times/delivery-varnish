@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 service:
   name: "" # The name of the service, should be defined in the specific app-configs folder.
-  hasHealthcheck: "true"
+  hasHealthcheck: "false"
   certificateAwsArn: "" # The ARN of the aws certificate use by the ELB created for this service
   htpasswdSecret: "varnish-auth" # The Kubernetes secret containing the contents of the .htpasswd file used for authentication.
 replicaCount: 2
