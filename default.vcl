@@ -88,19 +88,22 @@ sub vcl_recv {
         return (pass);
     }
 
-    if ((req.url ~ "^\/+content-preview.*$") || (req.url ~ "^\/+internalcontent-preview.*$")) {
+    //dedup leading slashes
+    set req.url = regsub(req.url, "^\/+(.*)$","/\1");
+
+    if ((req.url ~ "^\/content-preview.*$") || (req.url ~ "^\/+internalcontent-preview.*$")) {
         if (vsthrottle.is_denied(client.identity, 2, 1s)) {
     	    # Client has exceeded 2 reqs per 1s
     	    return (synth(429, "Too Many Requests"));
         }
-    } elseif (req.url ~ "^\/+content\/notifications-push.*$") {
+    } elseif (req.url ~ "^\/content\/notifications-push.*$") {
         set req.backend_hint = content_notifications_push;
-    } elseif (req.url ~ "^\/+lists\/notifications-push.*$") {
+    } elseif (req.url ~ "^\/lists\/notifications-push.*$") {
         set req.backend_hint = list_notifications_push;
         # Routing preset here as vulcan is unable to route on query strings
-    } elseif (req.url ~ "\/+content\?.*isAnnotatedBy=.*") {
+    } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
         set req.backend_hint = public_content_by_concept_api;
-    } elseif (req.url ~ "\/+concept\/search.*$") {
+    } elseif (req.url ~ "\/concept\/search.*$") {
         set req.backend_hint = concept_search_api;
     }
 
@@ -111,13 +114,13 @@ sub vcl_recv {
     unset req.http.Authorization;
     # We need authentication for internal apps, and no caching, and the authentication should not be passed to the internal apps.
     # This is why this line is after checking the authentication and unsetting the authentication header.
-    if (req.url ~ "^\/+__notifications-push/__health.*$") {
+    if (req.url ~ "^\/__notifications-push/__health.*$") {
         set req.url = regsub(req.url, "^\/__[\w-]*\/(.*)$", "/\1");
         set req.backend_hint = content_notifications_push;
-    } elseif (req.url ~ "^\/+__list-notifications-push/__health.*$") {
+    } elseif (req.url ~ "^\/__list-notifications-push/__health.*$") {
         set req.url = regsub(req.url, "^\/__[\w-]*\/(.*)$", "/\1");
         set req.backend_hint = list_notifications_push;
-    } elseif (req.url ~ "^\/+__[\w-]*\/.*$") {
+    } elseif (req.url ~ "^\/__[\w-]*\/.*$") {
         set req.backend_hint = internal_apps_routing_varnish;
         return (pipe);
     }
