@@ -86,12 +86,12 @@ sub vcl_recv {
     //dedup leading slashes
     set req.url = regsub(req.url, "^\/+(.*)$","/\1");
 
-    if ((req.url ~ "^\/+__health.*$") || (req.url ~ "^\/+__gtg.*$")) {
+    if ((req.url ~ "^\/__health.*$") || (req.url ~ "^\/__gtg.*$")) {
         set req.backend_hint = health_check_service;
         return (pass);
     }
 
-    if ((req.url ~ "^\/content-preview.*$") || (req.url ~ "^\/+internalcontent-preview.*$")) {
+    if ((req.url ~ "^\/content-preview.*$") || (req.url ~ "^\/internalcontent-preview.*$")) {
         if (vsthrottle.is_denied(client.identity, 2, 1s)) {
     	    # Client has exceeded 2 reqs per 1s
     	    return (synth(429, "Too Many Requests"));
