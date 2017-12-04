@@ -83,13 +83,13 @@ sub vcl_recv {
         set req.http.X-Original-Request-URL = "https://" + req.http.Host + req.url;
     }
 
+    //dedup leading slashes
+    set req.url = regsub(req.url, "^\/+(.*)$","/\1");
+
     if ((req.url ~ "^\/+__health.*$") || (req.url ~ "^\/+__gtg.*$")) {
         set req.backend_hint = health_check_service;
         return (pass);
     }
-
-    //dedup leading slashes
-    set req.url = regsub(req.url, "^\/+(.*)$","/\1");
 
     if ((req.url ~ "^\/content-preview.*$") || (req.url ~ "^\/+internalcontent-preview.*$")) {
         if (vsthrottle.is_denied(client.identity, 2, 1s)) {
