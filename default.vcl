@@ -87,7 +87,7 @@ sub vcl_recv {
     set req.url = regsub(req.url, "^\/+(.*)$","/\1");
 
     if ((req.url ~ "^\/__health.*$") || (req.url ~ "^\/__gtg.*$")) {
-        if (req.url ~ "^\/__health\/(dis|en)able-category.*$") {
+        if ((req.url ~ "^\/__health\/(dis|en)able-category.*$") || (req.url ~ "^\/__health\/.*-ack.*$")) {
             if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
                 return(synth(401, "Authentication required"));
             }
