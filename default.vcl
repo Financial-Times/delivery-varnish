@@ -87,6 +87,11 @@ sub vcl_recv {
     set req.url = regsub(req.url, "^\/+(.*)$","/\1");
 
     if ((req.url ~ "^\/__health.*$") || (req.url ~ "^\/__gtg.*$")) {
+        if (req.url ~ "^\/__health\/(dis|en)able-category.*$") {
+            if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
+                return(synth(401, "Authentication required"));
+            }
+        }
         set req.backend_hint = health_check_service;
         return (pass);
     }
