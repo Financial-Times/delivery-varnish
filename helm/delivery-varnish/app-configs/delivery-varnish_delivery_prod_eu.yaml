@@ -9,5 +9,5 @@ elb:
 s3:
   bucketName: "content-prod-elb-access-logs-eu-west-1"
   prefix: "upp-prod-delivery-eu/delivery-varnish"
-  enabled: true
-  interval: 5
+  enabled: "true"
+  interval: "5"
