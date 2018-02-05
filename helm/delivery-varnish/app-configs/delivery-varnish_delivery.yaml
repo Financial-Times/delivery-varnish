@@ -6,3 +6,6 @@ service:
 
 elb:
   tags: "systemCode=upp,teamDL=universal.publishing.platform@ft.com,environment=d"
+
+s3:
+  enabled: false
