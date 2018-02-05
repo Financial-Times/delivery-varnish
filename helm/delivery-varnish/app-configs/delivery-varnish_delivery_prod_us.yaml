@@ -7,7 +7,7 @@ elb:
   tags: "systemCode=upp,teamDL=universal.publishing.platform@ft.com,environment=p"
 
 s3:
-  bucketName: content-prod-elb-access-logs-us-east-1
-  prefix: upp-prod-delivery-us/delivery-varnish
+  bucketName: "content-prod-elb-access-logs-us-east-1"
+  prefix: "upp-prod-delivery-us/delivery-varnish"
   enabled: true
   interval: 5

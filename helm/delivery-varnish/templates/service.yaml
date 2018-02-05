@@ -13,13 +13,13 @@ metadata:
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "{{ .Values.service.certificateAwsArn }}"
     service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
-    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
     service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "{{ .Values.elb.tags }}"
-    {{- if .Values.s3.enabled }}
-    service.beta.kubernetes.io/aws-load-balancer-access-log-enabled: {{ .Values.s3.enabled }}
-    service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-name: {{ .Values.s3.bucketName }}
-    service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-prefix: {{ .Values.s3.prefix }}
-    service.beta.kubernetes.io/aws-load-balancer-access-log-emit-interval: {{ .Values.s3.interval }}
+    {{- if eq .Values.s3.enabled "true" }}
+    service.beta.kubernetes.io/aws-load-balancer-access-log-enabled: "{{ .Values.s3.enabled }}"
+    service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-name: "{{ .Values.s3.bucketName }}"
+    service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-prefix: "{{ .Values.s3.prefix }}"
+    service.beta.kubernetes.io/aws-load-balancer-access-log-emit-interval: "{{ .Values.s3.interval }}"
     {{- end }}
 
 spec:
