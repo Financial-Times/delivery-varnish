@@ -8,6 +8,4 @@ elb:
   tags: "systemCode=upp,teamDL=universal.publishing.platform@ft.com,environment=d"
 
 s3:
-  bucketName: "content-test-elb-access-logs-eu-west-1"
-  prefix: "upp-dev-delivery-eu/delivery-varnish"
   enabled: false
