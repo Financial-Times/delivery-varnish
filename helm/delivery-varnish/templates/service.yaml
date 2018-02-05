@@ -14,6 +14,7 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "{{ .Values.service.certificateAwsArn }}"
     service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
     service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
+    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "{{ .Values.elb.tags }}"
 
 spec:
   type: LoadBalancer
