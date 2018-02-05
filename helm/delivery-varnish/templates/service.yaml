@@ -17,7 +17,8 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "{{ .Values.elb.tags }}"
     service.beta.kubernetes.io/aws-load-balancer-access-log-enabled: true
     service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-name: "{{ .Values.s3.bucketName }}"
-    service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-prefix: "{{ .Values.s3.perfix }}"
+    service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-prefix: "{{ .Values.s3.prefix }}"
+    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: 60
 
 spec:
   type: LoadBalancer
