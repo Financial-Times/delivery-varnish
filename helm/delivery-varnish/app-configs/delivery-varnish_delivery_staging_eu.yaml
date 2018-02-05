@@ -10,3 +10,4 @@ s3:
   bucketName: content-prod-elb-access-logs-eu-west-1
   prefix: upp-staging-delivery-eu/delivery-varnish
   enabled: true
+  interval: 5
