@@ -8,5 +8,5 @@ elb:
   tags: "systemCode=upp,teamDL=universal.publishing.platform@ft.com,environment=d"
 
 s3:
-  bucketName: ""
-  prefix: ""
+  bucketName: 
+  prefix: 
