@@ -81,6 +81,13 @@ sub vcl_recv {
     //dedup leading slashes
     set req.url = regsub(req.url, "^\/+(.*)$","/\1");
 
+    // allow notifications-push health and gtg checks to pass without requiring auth
+    if ((req.url ~ "^\/__notifications-push/__health.*$") || (req.url ~ "^\/__notifications-push/__gtg.*$")) {
+        set req.url = regsub(req.url, "^\/__[\w-]*\/(.*)$", "/\1");
+        set req.backend_hint = content_notifications_push;
+        return (pass);
+    }
+
     if ((req.url ~ "^\/__health.*$") || (req.url ~ "^\/__gtg.*$")) {
         if ((req.url ~ "^\/__health\/(dis|en)able-category.*$") || (req.url ~ "^\/__health\/.*-ack.*$")) {
             if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
@@ -112,10 +119,7 @@ sub vcl_recv {
     unset req.http.Authorization;
     # We need authentication for internal apps, and no caching, and the authentication should not be passed to the internal apps.
     # This is why this line is after checking the authentication and unsetting the authentication header.
-    if ((req.url ~ "^\/__notifications-push/__health.*$") || (req.url ~ "^\/__notifications-push/__gtg.*$")) {
-        set req.url = regsub(req.url, "^\/__[\w-]*\/(.*)$", "/\1");
-        set req.backend_hint = content_notifications_push;
-    } elseif (req.url ~ "^\/__[\w-]*\/.*$") {
+    if (req.url ~ "^\/__[\w-]*\/.*$") {
         set req.backend_hint = internal_apps_routing_varnish;
         return (pipe);
     }
