@@ -34,6 +34,11 @@ backend concept_search_api {
   .port = "8080";
 }
 
+backend draft_suggestion_api {
+  .host = "draft-suggestion-api";
+  .port = "8080";
+}
+
 acl purge {
     "localhost";
 }
@@ -105,11 +110,12 @@ sub vcl_recv {
         }
     } elseif (req.url ~ "^\/content\/notifications-push.*$") {
         set req.backend_hint = content_notifications_push;
-        # Routing preset here as vulcan is unable to route on query strings
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
         set req.backend_hint = public_content_by_concept_api;
     } elseif (req.url ~ "\/concept\/search.*$") {
         set req.backend_hint = concept_search_api;
+    } elseif (req.url ~ "\/content\/suggest.*$") {
+        set req.backend_hint = draft_suggestion_api;
     }
 
     if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
