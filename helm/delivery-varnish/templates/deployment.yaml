@@ -1,0 +1,51 @@
+##this is an example deployment.yaml that should be customized in order to meet the configuration for app k8s deployment
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.service.name }} 
+  labels:
+    chart: "{{ .Chart.Name | trunc 63 }}"
+    chartVersion: "{{ .Chart.Version | trunc 63 }}" 
+    visualize: "true" 
+    app: {{ .Values.service.name }} 
+spec:
+  replicas: {{ .Values.replicaCount }} 
+  selector: 
+    matchLabels:
+      app: {{ .Values.service.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.service.name }}
+        visualize: "true" 
+    spec:
+      containers: 
+      - name: {{ .Values.service.name }} 
+        image: "{{ .Values.image.repository }}:{{ .Chart.Version }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env: 
+        ports:
+        - containerPort: 80
+        livenessProbe: 
+          tcpSocket: 
+            port: 80
+          initialDelaySeconds: 5
+        volumeMounts:
+        - name: varnish-htpasswd
+          mountPath: /etc/varnish/auth
+
+#       No readiness probe defined yet
+#        readinessProbe:
+#          httpGet:
+#            path: "/__gtg"
+#            port: 8080
+#          initialDelaySeconds: 15
+#          periodSeconds: 30
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+      volumes:
+      - name: varnish-htpasswd
+        secret:
+          secretName: {{ .Values.service.htpasswdSecret }}
+

@@ -1,0 +1,11 @@
+# Values used for the deployed application.
+service:
+  name: delivery-varnish
+  # Apply the certificate from content test by default
+  certificateAwsArn: "arn:aws:acm:eu-west-1:070529446553:certificate/53071112-759c-4875-97e2-c62425df1381"
+
+elb:
+  tags: "systemCode=upp,teamDL=universal.publishing.platform@ft.com,environment=d"
+
+s3:
+  enabled: "false"

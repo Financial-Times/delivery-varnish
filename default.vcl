@@ -5,18 +5,38 @@ import basicauth;
 
 # Default backend definition. Set this to point to your content server.
 backend default {
-    .host = "VARNISH_BACKEND_HOST";
-    .port = "VARNISH_BACKEND_PORT";
+    .host = "api-policy-component";
+    .port = "8080";
 }
 
-backend content_notifications_push_api {
-  .host = "VARNISH_BACKEND_HOST";
-  .port = "CONTENT_NOTIFICATIONS_PUSH_API_PORT";
+backend content_notifications_push {
+  .host = "notifications-push";
+  .port = "8599";
 }
 
-backend list_notifications_push {
-  .host = "VARNISH_BACKEND_HOST";
-  .port = "LIST_NOTIFICATIONS_PUSH_PORT";
+backend health_check_service {
+  .host = "upp-aggregate-healthcheck";
+  .port = "8080";
+}
+
+backend public_content_by_concept_api {
+  .host = "public-content-by-concept-api";
+  .port = "8080";
+}
+
+backend internal_apps_routing_varnish {
+  .host = "path-routing-varnish";
+  .port = "80";
+}
+
+backend concept_search_api {
+  .host = "concept-search-api";
+  .port = "8080";
+}
+
+backend draft_suggestion_api {
+  .host = "draft-suggestion-api";
+  .port = "8080";
 }
 
 acl purge {
@@ -63,14 +83,24 @@ sub vcl_recv {
         set req.http.X-Original-Request-URL = "https://" + req.http.Host + req.url;
     }
 
+    //dedup leading slashes
+    set req.url = regsub(req.url, "^\/+(.*)$","/\1");
+
+    // allow notifications-push health and gtg checks to pass without requiring auth
+    if ((req.url ~ "^\/__notifications-push/__health.*$") || (req.url ~ "^\/__notifications-push/__gtg.*$")) {
+        set req.url = regsub(req.url, "^\/__[\w-]*\/(.*)$", "/\1");
+        set req.backend_hint = content_notifications_push;
+        return (pass);
+    }
+
     if ((req.url ~ "^\/__health.*$") || (req.url ~ "^\/__gtg.*$")) {
-        set req.http.Host = "aggregate-healthcheck";
+        if ((req.url ~ "^\/__health\/(dis|en)able-category.*$") || (req.url ~ "^\/__health\/.*-ack.*$")) {
+            if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
+                return(synth(401, "Authentication required"));
+            }
+        }
+        set req.backend_hint = health_check_service;
         return (pass);
-    } elseif ((req.url ~ "^.*\/__health.*$") || (req.url ~ "^.*\/__gtg.*$")) {
-        return (pass);
-    } elseif (!req.url ~ "^\/__[\w-]*\/.*$") {
-        set req.http.Host = "HOST_HEADER";
-        set req.http.X-VarnishPassThrough = "true";
     }
 
     if ((req.url ~ "^\/content-preview.*$") || (req.url ~ "^\/internalcontent-preview.*$")) {
@@ -79,21 +109,26 @@ sub vcl_recv {
     	    return (synth(429, "Too Many Requests"));
         }
     } elseif (req.url ~ "^\/content\/notifications-push.*$") {
-        set req.backend_hint = content_notifications_push_api;
-    } elseif (req.url ~ "^\/lists\/notifications-push.*$") {
-        set req.backend_hint = list_notifications_push;
-        # Routing preset here as vulcan is unable to route on query strings
+        set req.backend_hint = content_notifications_push;
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
-        set req.http.Host = "public-content-by-concept-api";
+        set req.backend_hint = public_content_by_concept_api;
     } elseif (req.url ~ "\/concept\/search.*$") {
-        set req.http.Host = "concept-search-api";
+        set req.backend_hint = concept_search_api;
+    } elseif (req.url ~ "\/content\/suggest.*$") {
+        set req.backend_hint = draft_suggestion_api;
     }
 
-    if (!basicauth.match("/.htpasswd",  req.http.Authorization)) {
+    if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
         return(synth(401, "Authentication required"));
     }
 
     unset req.http.Authorization;
+    # We need authentication for internal apps, and no caching, and the authentication should not be passed to the internal apps.
+    # This is why this line is after checking the authentication and unsetting the authentication header.
+    if (req.url ~ "^\/__[\w-]*\/.*$") {
+        set req.backend_hint = internal_apps_routing_varnish;
+        return (pipe);
+    }
 }
 
 sub vcl_synth {

@@ -1,0 +1,13 @@
+# Values used for the deployed application.
+service:
+  name: delivery-varnish
+  certificateAwsArn: "arn:aws:acm:eu-west-1:469211898354:certificate/4e431fdf-0a66-436a-a998-37dd61307447"
+
+elb:
+  tags: "systemCode=upp,teamDL=universal.publishing.platform@ft.com,environment=t"
+
+s3:
+  bucketName: "content-prod-elb-access-logs-eu-west-1"
+  prefix: "upp-staging-delivery-eu/delivery-varnish"
+  enabled: "true"
+  interval: "5"

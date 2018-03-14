@@ -1,9 +1,6 @@
 FROM alpine:3.4
 
 ENV VARNISHSRC=/usr/include/varnish VMODDIR=/usr/lib/varnish/vmods
-ADD fmt /usr/bin/fmt
-ADD default.vcl /etc/varnish/default.vcl
-ADD start.sh /start.sh
 
 RUN apk --update add varnish varnish-dev git automake autoconf libtool python make py-docutils curl jq && \
   git clone https://github.com/varnish/libvmod-vsthrottle.git && \
@@ -14,7 +11,6 @@ RUN apk --update add varnish varnish-dev git automake autoconf libtool python ma
   make && \
   make install && \
   cd / && echo "-------basicauth-build-------" && \
-  chmod +x /usr/bin/fmt && \
   git clone http://git.gnu.org.ua/repo/vmod-basicauth.git && \
   cd vmod-basicauth && \
   git clone http://git.gnu.org.ua/repo/acvmod.git && \
@@ -30,6 +26,10 @@ RUN apk --update add varnish varnish-dev git automake autoconf libtool python ma
   apk del git automake autoconf libtool python make py-docutils && \
   rm -rf /var/cache/apk/* /libvmod-vsthrottle /vmod-basicauth
 
+COPY default.vcl /etc/varnish/default.vcl
+COPY start.sh /start.sh
+
 RUN chmod +x /start.sh
+
 EXPOSE 80
 CMD ["/start.sh"]
