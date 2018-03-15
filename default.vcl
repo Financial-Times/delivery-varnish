@@ -34,8 +34,8 @@ backend concept_search_api {
   .port = "8080";
 }
 
-backend draft_suggestion_api {
-  .host = "draft-suggestion-api";
+backend public_suggestions_api {
+  .host = "public-suggestions-api";
   .port = "8080";
 }
 
@@ -116,9 +116,9 @@ sub vcl_recv {
         set req.backend_hint = concept_search_api;
     } elseif (req.url ~ "\/content\/suggest/__gtg") {
         set req.url = "/__gtg";
-        set req.backend_hint = draft_suggestion_api;
+        set req.backend_hint = public_suggestions_api;
     } elseif (req.url ~ "\/content\/suggest.*$") {
-        set req.backend_hint = draft_suggestion_api;
+        set req.backend_hint = public_suggestions_api;
     }
 
     if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
