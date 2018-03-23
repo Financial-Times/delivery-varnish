@@ -9,6 +9,16 @@ backend default {
     .port = "8080";
 }
 
+backend dex {
+    .host = "dex";
+    .port = "8080";
+}
+
+backend dex-redirect {
+    .host = "dex-redirect";
+    .port = "8080";
+}
+
 backend content_notifications_push {
   .host = "notifications-push";
   .port = "8599";
@@ -85,6 +95,19 @@ sub vcl_recv {
 
     //dedup leading slashes
     set req.url = regsub(req.url, "^\/+(.*)$","/\1");
+
+    //  allow dex & dex-redirect access without requiring auth
+    if (req.url ~ "^\/dex/.*$") {
+        set req.url = regsub(req.url, "^\/[\w-]*\/(.*)$", "/\1");
+        set req.backend_hint = dex;
+        return (pass);
+    }
+
+    if (req.url ~ "^\/dex-redirect/.*$") {
+        set req.url = regsub(req.url, "^\/[\w-]*\/(.*)$", "/\1");
+        set req.backend_hint = dex-redirect;
+        return (pass);
+    }
 
     // allow notifications-push health and gtg checks to pass without requiring auth
     if ((req.url ~ "^\/__notifications-push/__health.*$") || (req.url ~ "^\/__notifications-push/__gtg.*$")) {
