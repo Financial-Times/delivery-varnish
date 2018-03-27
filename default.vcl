@@ -14,7 +14,7 @@ backend dex {
     .port = "8080";
 }
 
-backend dex-redirect {
+backend dex_redirect {
     .host = "dex-redirect";
     .port = "8080";
 }
@@ -105,7 +105,7 @@ sub vcl_recv {
 
     if (req.url ~ "^\/dex-redirect/.*$") {
         set req.url = regsub(req.url, "^\/[\w-]*\/(.*)$", "/\1");
-        set req.backend_hint = dex-redirect;
+        set req.backend_hint = dex_redirect;
         return (pass);
     }
 
