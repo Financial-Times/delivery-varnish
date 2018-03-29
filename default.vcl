@@ -10,12 +10,12 @@ backend default {
 }
 
 backend dex {
-    .host = "dex";
+    .host = "content-auth-dex";
     .port = "8080";
 }
 
 backend dex_redirect {
-    .host = "dex-redirect";
+    .host = "content-auth-dex-redirect";
     .port = "8080";
 }
 
@@ -97,13 +97,13 @@ sub vcl_recv {
     set req.url = regsub(req.url, "^\/+(.*)$","/\1");
 
     //  allow dex & dex-redirect access without requiring auth
-    if (req.url ~ "^\/dex/.*$") {
+    if ((req.url ~ "^\/dex/.*$") || (req.url ~ "^\/dex$")) {
         set req.url = regsub(req.url, "^\/[\w-]*\/(.*)$", "/\1");
         set req.backend_hint = dex;
         return (pass);
     }
 
-    if (req.url ~ "^\/dex-redirect/.*$") {
+    if ((req.url ~ "^\/dex-redirect/.*$") || (req.url ~ "^\/dex-redirect$")) {
         set req.url = regsub(req.url, "^\/[\w-]*\/(.*)$", "/\1");
         set req.backend_hint = dex_redirect;
         return (pass);
