@@ -97,14 +97,12 @@ sub vcl_recv {
     set req.url = regsub(req.url, "^\/+(.*)$","/\1");
 
     //  allow dex & dex-redirect access without requiring auth
-    if ((req.url ~ "^\/dex/.*$") || (req.url ~ "^\/dex$")) {
-        set req.url = regsub(req.url, "^\/[\w-]*\/(.*)$", "/\1");
+    if (req.http.Host ~ "^.*-dex\.ft\.com$") {
         set req.backend_hint = dex;
         return (pass);
     }
 
-    if ((req.url ~ "^\/dex-redirect/.*$") || (req.url ~ "^\/dex-redirect$")) {
-        set req.url = regsub(req.url, "^\/[\w-]*\/(.*)$", "/\1");
+    if (req.http.Host ~ "^.*-dex-redirect\.ft\.com$") {
         set req.backend_hint = dex_redirect;
         return (pass);
     }
