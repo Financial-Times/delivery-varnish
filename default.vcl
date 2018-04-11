@@ -74,9 +74,6 @@ sub exploit_workaround_4_1 {
 sub vcl_recv {
     call exploit_workaround_4_1;
 
-    # Remove all cookies; we don't need them, and setting cookies bypasses varnish caching.
-    unset req.http.Cookie;
-
     # allow PURGE from localhost
     if (req.method == "PURGE") {
         if (!client.ip ~ purge) {
@@ -89,13 +86,6 @@ sub vcl_recv {
         return(synth(200, "robots"));
     }
 
-    if ((!req.http.X-Original-Request-URL) && req.http.X-Forwarded-For && req.http.Host) {
-        set req.http.X-Original-Request-URL = "https://" + req.http.Host + req.url;
-    }
-
-    //dedup leading slashes
-    set req.url = regsub(req.url, "^\/+(.*)$","/\1");
-
     //  allow dex & dex-redirect access without requiring auth
     if (req.http.Host ~ "^.*-dex\.ft\.com$") {
         set req.backend_hint = dex;
@@ -106,6 +96,16 @@ sub vcl_recv {
         set req.backend_hint = dex_redirect;
         return (pass);
     }
+
+    # Remove all cookies; we don't need them, and setting cookies bypasses varnish caching.
+    unset req.http.Cookie;
+
+    if ((!req.http.X-Original-Request-URL) && req.http.X-Forwarded-For && req.http.Host) {
+        set req.http.X-Original-Request-URL = "https://" + req.http.Host + req.url;
+    }
+
+    //dedup leading slashes
+    set req.url = regsub(req.url, "^\/+(.*)$","/\1");
 
     // allow notifications-push health and gtg checks to pass without requiring auth
     if ((req.url ~ "^\/__notifications-push/__health.*$") || (req.url ~ "^\/__notifications-push/__gtg.*$")) {
