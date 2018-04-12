@@ -98,6 +98,7 @@ sub vcl_recv {
     }
 
     # Remove all cookies; we don't need them, and setting cookies bypasses varnish caching.
+    # Do not do this before the dex & dex-redirect routing, as they rely on cookies
     unset req.http.Cookie;
 
     if ((!req.http.X-Original-Request-URL) && req.http.X-Forwarded-For && req.http.Host) {
