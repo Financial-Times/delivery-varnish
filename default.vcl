@@ -41,6 +41,7 @@ backend public_suggestions_api {
 
 acl purge {
     "localhost";
+    "10.2.0.0"/16;
 }
 
 sub exploit_workaround_4_1 {
