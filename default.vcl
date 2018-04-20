@@ -9,6 +9,16 @@ backend default {
     .port = "8080";
 }
 
+backend dex {
+    .host = "content-auth-dex";
+    .port = "8080";
+}
+
+backend dex_redirect {
+    .host = "content-auth-dex-redirect";
+    .port = "8080";
+}
+
 backend content_notifications_push {
   .host = "notifications-push";
   .port = "8599";
@@ -65,9 +75,6 @@ sub exploit_workaround_4_1 {
 sub vcl_recv {
     call exploit_workaround_4_1;
 
-    # Remove all cookies; we don't need them, and setting cookies bypasses varnish caching.
-    unset req.http.Cookie;
-
     # allow PURGE from localhost
     if (req.method == "PURGE") {
         if (!client.ip ~ purge) {
@@ -79,6 +86,21 @@ sub vcl_recv {
     if (req.url ~ "^\/robots\.txt$") {
         return(synth(200, "robots"));
     }
+
+    //  allow dex & dex-redirect access without requiring auth
+    if (req.http.Host ~ "^.*-dex\.ft\.com$") {
+        set req.backend_hint = dex;
+        return (pass);
+    }
+
+    if (req.http.Host ~ "^.*-dex-redirect\.ft\.com$") {
+        set req.backend_hint = dex_redirect;
+        return (pass);
+    }
+
+    # Remove all cookies; we don't need them, and setting cookies bypasses varnish caching.
+    # Do not do this before the dex & dex-redirect routing, as they rely on cookies
+    unset req.http.Cookie;
 
     if ((!req.http.X-Original-Request-URL) && req.http.X-Forwarded-For && req.http.Host) {
         set req.http.X-Original-Request-URL = "https://" + req.http.Host + req.url;
