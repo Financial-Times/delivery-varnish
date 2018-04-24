@@ -68,13 +68,22 @@ sub vcl_recv {
     # Remove all cookies; we don't need them, and setting cookies bypasses varnish caching.
     unset req.http.Cookie;
 
-    # allow PURGE from localhost
+    # allow PURGE from localhost and 10.2...
     if (req.method == "PURGE") {
         if (!client.ip ~ purge) {
             return(synth(405,"Not allowed."));
         }
         return (purge);
     }
+
+    # allow BAN from localhost and 10.2...
+		if (req.method == "BAN") {
+				if (!client.ip ~ purge) {
+  					return(synth(403, "Not allowed."));
+				}
+				ban("req.url == " + req.url);
+				return(synth(200, "Ban added"));
+		}
 
     if (req.url ~ "^\/robots\.txt$") {
         return(synth(200, "robots"));
