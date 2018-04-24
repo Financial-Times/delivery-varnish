@@ -81,7 +81,7 @@ sub vcl_recv {
 				if (!client.ip ~ purge) {
   					return(synth(403, "Not allowed."));
 				}
-				ban("req.url == " + req.url);
+				ban("obj.http.url == " + req.url);
 				return(synth(200, "Ban added"));
 		}
 
@@ -158,6 +158,8 @@ Disallow: /"});
 }
 
 sub vcl_backend_response {
+    # BANNING related
+    set beresp.http.url = bereq.url;
     # Happens after we have read the response headers from the backend.
     #
     # Here you clean the response headers, removing silly Set-Cookie headers
@@ -183,4 +185,7 @@ sub vcl_deliver {
     } else {
         set resp.http.X-Cache = "MISS";
     }
+
+    # BANNING related
+    unset resp.http.url;
 }
