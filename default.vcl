@@ -77,13 +77,13 @@ sub vcl_recv {
     }
 
     # allow BAN from localhost and 10.2...
-		if (req.method == "BAN") {
-				if (!client.ip ~ purge) {
-  					return(synth(403, "Not allowed."));
-				}
-				ban("obj.http.url == " + req.url);
-				return(synth(200, "Ban added"));
-		}
+    if (req.method == "BAN") {
+        if (!client.ip ~ purge) {
+            return(synth(403, "Not allowed."));
+        }
+        ban("obj.http.url == " + req.url);
+        return(synth(200, "Ban added"));
+    }
 
     if (req.url ~ "^\/robots\.txt$") {
         return(synth(200, "robots"));
