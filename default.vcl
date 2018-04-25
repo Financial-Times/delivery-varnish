@@ -62,6 +62,12 @@ sub exploit_workaround_4_1 {
     }
 }
 
+sub vcl_hash {
+    # set cache key to lowercased req.url
+    hash_data(std.tolower(req.url));
+    return (lookup);
+}
+
 sub vcl_recv {
     call exploit_workaround_4_1;
 
@@ -74,15 +80,6 @@ sub vcl_recv {
             return(synth(405,"Not allowed."));
         }
         return (purge);
-    }
-
-    # allow BAN from localhost and 10.2...
-    if (req.method == "BAN") {
-        if (!client.ip ~ purge) {
-            return(synth(403, "Not allowed."));
-        }
-        ban("obj.http.url == " + req.url);
-        return(synth(200, "Ban added"));
     }
 
     if (req.url ~ "^\/robots\.txt$") {
@@ -158,9 +155,6 @@ Disallow: /"});
 }
 
 sub vcl_backend_response {
-    # BANNING related - this is needed in order to force varnish cache to store the cached object under the same url without considering the ip of the request
-    set beresp.http.url = bereq.url;
-
     # Happens after we have read the response headers from the backend.
     #
     # Here you clean the response headers, removing silly Set-Cookie headers
@@ -186,7 +180,4 @@ sub vcl_deliver {
     } else {
         set resp.http.X-Cache = "MISS";
     }
-
-    # BANNING related - remove the backend requested url since this it doesn't represent interest for the client
-    unset resp.http.url;
 }
