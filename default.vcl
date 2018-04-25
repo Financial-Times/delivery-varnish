@@ -158,8 +158,9 @@ Disallow: /"});
 }
 
 sub vcl_backend_response {
-    # BANNING related
+    # BANNING related - this is needed in order to force varnish cache to store the cached object under the same url without considering the ip of the request
     set beresp.http.url = bereq.url;
+
     # Happens after we have read the response headers from the backend.
     #
     # Here you clean the response headers, removing silly Set-Cookie headers
@@ -186,6 +187,6 @@ sub vcl_deliver {
         set resp.http.X-Cache = "MISS";
     }
 
-    # BANNING related
+    # BANNING related - remove the backend requested url since this it doesn't represent interest for the client
     unset resp.http.url;
 }
