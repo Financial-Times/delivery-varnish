@@ -2,6 +2,7 @@ vcl 4.0;
 
 import vsthrottle;
 import basicauth;
+import std;
 
 # Default backend definition. Set this to point to your content server.
 backend default {
@@ -67,13 +68,19 @@ sub exploit_workaround_4_1 {
     }
 }
 
+sub vcl_hash {
+    # set cache key to lowercased req.url
+    hash_data(std.tolower(req.url));
+    return (lookup);
+}
+
 sub vcl_recv {
     call exploit_workaround_4_1;
 
     # Remove all cookies; we don't need them, and setting cookies bypasses varnish caching.
     unset req.http.Cookie;
 
-    # allow PURGE from localhost
+    # allow PURGE from localhost and 10.2...
     if (req.method == "PURGE") {
         if (!client.ip ~ purge) {
             return(synth(405,"Not allowed."));
