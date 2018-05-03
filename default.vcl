@@ -30,11 +30,6 @@ backend internal_apps_routing_varnish {
   .port = "80";
 }
 
-backend content_search_api_port {
-  .host = "content-search-api-port";
-  .port = "8080";
-}
-
 backend concept_search_api {
   .host = "concept-search-api";
   .port = "8080";
@@ -132,9 +127,6 @@ sub vcl_recv {
         set req.backend_hint = public_suggestions_api;
     } elseif (req.url ~ "\/content\/suggest.*$") {
         set req.backend_hint = public_suggestions_api;
-    } elseif (req.url ~ "\/content\/search.*$") {
-        set req.url = regsub(req.url, "^\/content\/(.*)$", "/\1");
-        set req.backend_hint = content_search_api_port;
     }
 
     if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
