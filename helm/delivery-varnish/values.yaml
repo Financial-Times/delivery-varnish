@@ -11,7 +11,7 @@ image:
   repository: coco/delivery-varnish
   pullPolicy: IfNotPresent
 elbRegistrator:
-  image: "coco/coco-elb-dns-registrator:k8s_v0.0.4"
+  image: "coco/coco-elb-dns-registrator:5.0.0"
 #resources:
 #  limits:
 #    memory: 256Mi
