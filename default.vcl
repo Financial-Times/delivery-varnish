@@ -50,24 +50,6 @@ acl purge {
     "10.2.0.0"/16;
 }
 
-sub exploit_workaround_4_1 {
-    # This needs to come before your vcl_recv function
-    # The following code is only valid for Varnish Cache and
-    # Varnish Cache Plus versions 4.1.x and 5.0.0
-    if (req.http.transfer-encoding ~ "(?i)chunked") {
-        C{
-        struct dummy_req {
-            unsigned magic;
-            int step;
-            int req_body_status;
-        };
-        ((struct dummy_req *)ctx->req)->req_body_status = 5;
-        }C
-
-        return (synth(503, "Bad request"));
-    }
-}
-
 sub vcl_hash {
     # set cache key to lowercased req.url
     hash_data(std.tolower(req.url));
@@ -75,8 +57,6 @@ sub vcl_hash {
 }
 
 sub vcl_recv {
-    call exploit_workaround_4_1;
-
     # Remove all cookies; we don't need them, and setting cookies bypasses varnish caching.
     unset req.http.Cookie;
 
@@ -159,6 +139,10 @@ Disallow: /"});
     if (resp.status == 401) {
         set resp.http.WWW-Authenticate = "Basic realm=Secured";
         set resp.status = 401;
+        return (deliver);
+    }
+
+    if ((resp.status == 429) || (resp.status == 405)) {
         return (deliver);
     }
 }
