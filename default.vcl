@@ -127,9 +127,9 @@ sub vcl_recv {
         set req.url = regsub(req.url, "^\/content\/(.*)$", "/\1");
         set req.backend_hint = content_search_api_port;
     } elseif (req.url ~ "^\/content\/validate.*$") {
-        if (req.http.Content-Type == "application/vnd.ft-upp-article+json") {
+        if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-article\+json.*$") {
             set req.backend_hint = upp_article_validator;
-        } elseif (req.http.Content-Type == "application/vnd.ft-upp-article-internal+json") {
+        } elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-article-internal\+json.*$") {
             set req.backend_hint = upp_internal_article_validator;
         }
     }
