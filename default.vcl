@@ -45,6 +45,17 @@ backend public_suggestions_api {
   .port = "8080";
 }
 
+backend upp_article_validator {
+  .host = "upp-article-validator";
+  .port = "8080";
+}
+
+backend upp_internal_article_validator {
+  .host = "upp-internal-article-validator";
+  .port = "8080";
+}
+
+
 acl purge {
     "localhost";
     "10.2.0.0"/16;
@@ -115,6 +126,12 @@ sub vcl_recv {
     } elseif (req.url ~ "\/content\/search.*$") {
         set req.url = regsub(req.url, "^\/content\/(.*)$", "/\1");
         set req.backend_hint = content_search_api_port;
+    } elseif (req.url ~ "^\/content\/validate.*$") {
+        if (req.http.Content-Type == "application/vnd.ft-upp-article+json") {
+            set req.backend_hint = upp_article_validator;
+        } elseif (req.http.Content-Type == "application/vnd.ft-upp-article-internal+json") {
+            set req.backend_hint = upp_internal_article_validator;
+        }
     }
 
     if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
