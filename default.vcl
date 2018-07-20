@@ -55,6 +55,10 @@ backend upp_internal_article_validator {
   .port = "8080";
 }
 
+backend upp_image_validator {
+  .host = "upp-image-validator";
+  .port = "8080";
+}
 
 acl purge {
     "localhost";
@@ -133,6 +137,12 @@ sub vcl_recv {
         } elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-article-internal\+json.*$") {
             set req.url = "/validate";
             set req.backend_hint = upp_internal_article_validator;
+        }elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-image(-set)?\+json.*$") {
+            set req.url = "/validate";
+            set req.backend_hint = upp_image_validator;
+        }elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-graphic\+json.*$") {
+            set req.url = "/validate";
+            set req.backend_hint = upp_image_validator;
         }
     }
 
