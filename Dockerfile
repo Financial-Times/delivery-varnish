@@ -13,12 +13,6 @@ RUN apk --update add varnish varnish-dev git automake autoconf libtool python ma
   cd / && echo "-------basicauth-build-------" && \
   git clone http://git.gnu.org.ua/repo/vmod-basicauth.git && \
   cd vmod-basicauth && \
-  # git clone http://git.gnu.org.ua/repo/acvmod.git && \
-  # git checkout 2a76106cbd56643757ab8096c4674bb55253a1ed && \
-  # mkdir -p /usr/include/varnish/bin/varnishtest/ && \
-  # ln -s /usr/bin/varnishtest /usr/include/varnish/bin/varnishtest/varnishtest && \
-  # mkdir -p /usr/include/varnish/lib/libvcc/ && \
-  # ln -s /usr/share/varnish/vmodtool.py /usr/include/varnish/lib/libvcc/vmodtool.py && \
   ./bootstrap && \
   ./configure && \
   make && \
