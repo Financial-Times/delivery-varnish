@@ -8,9 +8,8 @@ RUN apk --update add varnish varnish-dev git automake autoconf libtool python ma
   ./bootstrap && \
   ./configure && \
   make && \
-  # make check && \
   make install && \
-  cd / && echo "-------basicauth-build-------" && \
+  cd / && \
   git clone http://git.gnu.org.ua/repo/vmod-basicauth.git && \
   cd vmod-basicauth && \
   ./bootstrap && \
