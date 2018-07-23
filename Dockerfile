@@ -3,6 +3,7 @@ FROM alpine:3.7
 ENV VARNISHSRC=/usr/include/varnish VMODDIR=/usr/lib/varnish/vmods
 
 RUN apk --update add varnish varnish-dev git automake autoconf libtool python make py-docutils curl jq && \
+  cd / && \
   git clone https://github.com/varnish/varnish-modules.git && \
   cd varnish-modules && \
   ./bootstrap && \
