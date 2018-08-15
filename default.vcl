@@ -202,4 +202,16 @@ sub vcl_deliver {
     } else {
         set resp.http.X-Cache = "MISS";
     }
+
+    # CORS response for smartlogic widget
+    if (req.http.Origin == "https://cloud.smartlogic.com") {
+        set resp.http.Access-Control-Allow-Origin = req.http.Origin;
+        set resp.http.Access-Control-Allow-Methods = "GET, POST, OPTIONS";
+        set resp.http.Access-Control-Allow-Headers = "*";
+    }
+    if (resp.http.Vary) {
+        set resp.http.Vary = resp.http.Vary + ",Origin";
+    } else {
+        set resp.http.Vary = "Origin";
+    }
 }
