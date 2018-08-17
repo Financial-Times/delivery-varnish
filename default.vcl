@@ -204,7 +204,7 @@ sub vcl_deliver {
     }
 
     # CORS response for smartlogic widget
-    if (req.http.Origin == "https://cloud.smartlogic.com" && req.url ~ "(\/content|\/concept\/search|\/concordances)") {
+    if (req.http.Origin == "https://cloud.smartlogic.com" && req.url ~ "(\/content.*|\/concept\/search.*|\/concordances.*)") {
         set resp.http.Access-Control-Allow-Origin = req.http.Origin;
         set resp.http.Access-Control-Allow-Methods = "GET, POST, OPTIONS";
         set resp.http.Access-Control-Allow-Headers = "*";
