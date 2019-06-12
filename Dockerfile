@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM alpine:3.8
 
 ENV VARNISHSRC=/usr/include/varnish VMODDIR=/usr/lib/varnish/vmods
 
@@ -6,7 +6,7 @@ RUN apk --update add varnish varnish-dev git automake autoconf libtool python ma
   cd / && \
   git clone https://github.com/varnish/varnish-modules.git && \
   cd varnish-modules && \
-  git checkout 19b479ac756645b5a6fa79d398329f4a37cca5c8 && \
+  git checkout 0d555b627333cd9190a40870f380ace5664f6d0d && \
   ./bootstrap && \
   ./configure && \
   make && \
@@ -14,7 +14,7 @@ RUN apk --update add varnish varnish-dev git automake autoconf libtool python ma
   cd / && \
   git clone http://git.gnu.org.ua/repo/vmod-basicauth.git && \
   cd vmod-basicauth && \
-  git checkout a9a5d76f3fdac0ddbf76f7d021be3c95b7bfbdef && \
+  git checkout ef9772ebab0c3aeaf6ad9a8f843fa458d0c8397c && \
   ./bootstrap && \
   ./configure && \
   make && \
