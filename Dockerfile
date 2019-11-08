@@ -2,7 +2,7 @@ FROM alpine:3.9
 
 ENV VARNISHSRC=/usr/include/varnish VMODDIR=/usr/lib/varnish/vmods
 
-RUN apk --update add  varnish-dev git automake autoconf libtool python make py-docutils curl jq && apk add --repository http://dl-cdn.alpinelinux.org/alpine/v3.8/main/ varnish~=6.0.2-r0 && \
+RUN apk --update add  varnish-dev git automake autoconf libtool python make py-docutils curl jq wget tar sphinx-python  py-sphinx pcre pcre-dev libc-dev libedit libedit-dev libexecinfo libgcc musl ncurses-libs varnish-libs coreutils dpkg dpkg-dev libexecinfo-dev linux-headers ncurses-dev patch pcre-dev && wget https://varnish-cache.org/_downloads/varnish-6.0.2.tgz && tar zxvf varnish-6.0.2.tgz && cd varnish-6.0.2 && ./configure && make && make install && \
   cd / && \
   git clone https://github.com/varnish/varnish-modules.git && \
   cd varnish-modules && \
