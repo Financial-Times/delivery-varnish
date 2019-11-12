@@ -2,11 +2,11 @@ FROM alpine:3.9
 
 ENV VARNISHSRC=/usr/include/varnish VMODDIR=/usr/lib/varnish/vmods
 
-RUN apk --update add  varnish-dev git automake autoconf libtool python make py-docutils curl jq && apk add --repository http://dl-cdn.alpinelinux.org/alpine/v3.8/main/ varnish~=6.0.2-r0 && \
+RUN apk --update add  varnish-dev git automake autoconf libtool python3 make py-docutils curl jq && apk add --repository http://dl-cdn.alpinelinux.org/alpine/v3.9/main/ varnish~=6.2.1-r0 && ln -s /usr/bin/python3 /usr/bin/python && \
   cd / && \
   git clone https://github.com/varnish/varnish-modules.git && \
   cd varnish-modules && \
-  git checkout  0d555b627333cd9190a40870f380ace5664f6d0d && \
+  git checkout  f771780801b5cf8b77954226a4f623fac759cd1e && \
   ./bootstrap && \
   ./configure && \
   make  && \
@@ -19,7 +19,7 @@ RUN apk --update add  varnish-dev git automake autoconf libtool python make py-d
   ./configure && \
   make && \
   make install && \
-  apk del git automake autoconf libtool python make py-docutils && \
+  apk del git automake autoconf libtool python3 make py-docutils && \
   rm -rf /var/cache/apk/* /libvmod-vsthrottle /vmod-basicauth
 
 COPY default.vcl /etc/varnish/default.vcl
