@@ -60,6 +60,11 @@ backend upp_image_validator {
   .port = "8080";
 }
 
+backend upp_list_validator {
+  .host = "upp-list-validator";
+  .port = "8080";
+}
+
 backend upp_schema_reader {
   .host = "upp-schema-reader";
   .port = "8080";
@@ -148,6 +153,9 @@ sub vcl_recv {
         }elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-graphic\+json.*$") {
             set req.url = "/validate";
             set req.backend_hint = upp_image_validator;
+        }elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-list\+json.*$") {
+            set req.url = "/validate";
+            set req.backend_hint = upp_list_validator;
         }
     } elseif (req.url ~ "^\/schemas.*$") {
             set req.backend_hint = upp_schema_reader;
