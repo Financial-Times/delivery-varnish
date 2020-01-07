@@ -16,3 +16,5 @@ elbRegistrator:
 #  limits:
 #    memory: 256Mi
 
+route53_elb_registrator:
+  image: "coco/upp-route53-elb-dns-registrator:1.0.1"
