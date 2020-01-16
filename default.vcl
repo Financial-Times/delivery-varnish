@@ -196,7 +196,7 @@ sub vcl_backend_response {
     #
     # Here you clean the response headers, removing silly Set-Cookie headers
     # and other mistakes your backend does.
-    if (((beresp.status == 500) || (beresp.status == 502) || (beresp.status == 503) || (beresp.status == 504)) && (bereq.method == "GET" )) {
+    if (((beresp.status == 500) || (beresp.status == 502) || (beresp.status == 503) || (beresp.status == 504)) && (bereq.method == "GET" ) && (beresp.backend.name != health_check_service)) {
         if (bereq.retries < 2 ) {
             return(retry);
         }
