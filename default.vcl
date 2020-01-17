@@ -231,7 +231,8 @@ sub vcl_backend_response {
         if (bereq.retries < 2 ) {
             return(retry);
         }
-        
+    }
+       
     if (((beresp.status == 500) || (beresp.status == 502) || (beresp.status == 503) || (beresp.status == 504)) && (bereq.method == "GET" ) && (beresp.backend.name == health_check_service)) {
         if (bereq.retries < 2 ) {
             # This marks the backend as sick for this specific
