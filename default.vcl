@@ -20,11 +20,25 @@ backend content_notifications_push {
 backend health_check_service {
   .host = "upp-aggregate-healthcheck";
   .port = "8080";
+  .probe = {
+      .url = "/";
+      .timeout = 1s;
+      .interval = 5s;
+      .window = 5;
+      .threshold = 3;
+  }
 }
 
 backend health_check_service-second {
   .host = "upp-aggregate-healthcheck-second";
   .port = "8080";
+  .probe = {
+      .url = "/";
+      .timeout = 1s;
+      .interval = 5s;
+      .window = 5;
+      .threshold = 3;
+  }
 }
 
 backend public_content_by_concept_api {
@@ -81,8 +95,8 @@ sub vcl_init {
     # Instantiate sm1, sm2 for backends tile1, tile2
     # with 10 blacklisted objects as the threshold for marking the
     # whole backend sick.
-    new health1 = saintmode.saintmode(health_check_service-second, 10);
-    new health2 = saintmode.saintmode(health_check_service, 10);
+    new health1 = saintmode.saintmode(health_check_service-second, 2);
+    new health2 = saintmode.saintmode(health_check_service, 2);
 
     # Add both to a director. Use sm0, sm1 in place of tile1, tile2.
     # Other director types can be used in place of random.
@@ -237,7 +251,7 @@ sub vcl_backend_response {
         if (bereq.retries < 2 ) {
             # This marks the backend as sick for this specific
             # object for the next 20s.
-            saintmode.blacklist(10s);
+            saintmode.blacklist(20s);
             # Retry the request. This will result in a different backend
             # being used.
             return(retry);
