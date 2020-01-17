@@ -21,7 +21,7 @@ backend health_check_service {
   .host = "upp-aggregate-healthcheck";
   .port = "8080";
   .probe = {
-      .url = "/";
+      .url = "/__gtg?categories=read";
       .timeout = 1s;
       .interval = 5s;
       .window = 5;
@@ -33,7 +33,7 @@ backend health_check_service-second {
   .host = "upp-aggregate-healthcheck-second";
   .port = "8080";
   .probe = {
-      .url = "/";
+      .url = "/__gtg?categories=read";
       .timeout = 1s;
       .interval = 5s;
       .window = 5;
