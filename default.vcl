@@ -21,9 +21,9 @@ backend health_check_service {
   .host = "upp-aggregate-healthcheck";
   .port = "8080";
   .probe = {
-      .url = "/__gtg";
+      .url = "/__health";
       .timeout = 1s;
-      .interval = 5s;
+      .interval = 7s;
       .window = 5;
       .threshold = 2;
   }
@@ -33,9 +33,9 @@ backend health_check_service-second {
   .host = "upp-aggregate-healthcheck-second";
   .port = "8080";
   .probe = {
-      .url = "/__gtg";
+      .url = "/__health";
       .timeout = 1s;
-      .interval = 5s;
+      .interval = 7s;
       .window = 5;
       .threshold = 2;
   }
@@ -248,14 +248,16 @@ sub vcl_backend_response {
     }
        
     if (((beresp.status == 500) || (beresp.status == 502) || (beresp.status == 503) || (beresp.status == 504)) && (bereq.method == "GET" ) && ((beresp.backend.name == health_check_service) || (beresp.backend.name == health_check_service-second))) {
-        if (bereq.retries < 3 ) {
+        saintmode.blacklist(7s);
+        return(retry);           
+        #if (bereq.retries < 2 ) {
             # This marks the backend as sick for this specific
             # object for the next 20s.
-            saintmode.blacklist(10s);
+        #    saintmode.blacklist(20s);
             # Retry the request. This will result in a different backend
             # being used.
-            return(retry);
-        }
+        #    return(retry);
+        #}
     }
 
     if (beresp.status == 301 && ((beresp.http.cache-control !~ "s-maxage") || (beresp.http.cache-control !~ "max-age"))){
