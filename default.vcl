@@ -214,7 +214,7 @@ Disallow: /"});
 
 
 sub vcl_backend_fetch {
-    if ((beresp.backend.name == healthdirector) && (bereq.retries > 0)) {
+    if ((bereq.backend == healthdirector.backend()) && (bereq.retries > 0)) {
         # Get a backend from the director.
         # When returning a backend, the director will only return backends
         # saintmode says are healthy.
