@@ -21,11 +21,11 @@ backend health_check_service {
   .host = "upp-aggregate-healthcheck";
   .port = "8080";
   .probe = {
-      .url = "/__health";
+      .url = "/__gtg";
       .timeout = 1s;
       .interval = 5s;
       .window = 5;
-      .threshold = 3;
+      .threshold = 2;
   }
 }
 
@@ -33,11 +33,11 @@ backend health_check_service-second {
   .host = "upp-aggregate-healthcheck-second";
   .port = "8080";
   .probe = {
-      .url = "/__health";
+      .url = "/__gtg";
       .timeout = 1s;
       .interval = 5s;
       .window = 5;
-      .threshold = 3;
+      .threshold = 2;
   }
 }
 
