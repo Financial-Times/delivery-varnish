@@ -241,13 +241,13 @@ sub vcl_backend_response {
     #
     # Here you clean the response headers, removing silly Set-Cookie headers
     # and other mistakes your backend does.
-    if (((beresp.status == 500) || (beresp.status == 502) || (beresp.status == 503) || (beresp.status == 504)) && (bereq.method == "GET" ) && (beresp.backend.name != health_check_service)  && (beresp.backend.name != health_check_service-second)) {
+    if (((beresp.status == 500) || (beresp.status == 502) || (beresp.status == 503) || (beresp.status == 504)) && (bereq.method == "GET" ) && ((beresp.backend.name != health_check_service) || (beresp.backend.name != health_check_service-second))) {
         if (bereq.retries < 2 ) {
             return(retry);
         }
     }
        
-    if (((beresp.status == 500) || (beresp.status == 502) || (beresp.status == 503) || (beresp.status == 504)) && (bereq.method == "GET" ) && (bereq.url == "/__gtg?categories=read")) {
+    if (((beresp.status == 500) || (beresp.status == 502) || (beresp.status == 503) || (beresp.status == 504)) && (bereq.method == "GET" ) && ((beresp.backend.name == health_check_service) || (beresp.backend.name == health_check_service-second))) {
         if (bereq.retries < 2 ) {
             # This marks the backend as sick for this specific
             # object for the next 20s.
