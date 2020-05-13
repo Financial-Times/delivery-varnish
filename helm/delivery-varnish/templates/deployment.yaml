@@ -1,25 +1,29 @@
 ##this is an example deployment.yaml that should be customized in order to meet the configuration for app k8s deployment
-
+{{- if .Values.eksCluster }}
+apiVersion: apps/v1
+{{- else }}
 apiVersion: extensions/v1beta1
+{{- end }}
 kind: Deployment
 metadata:
-  name: {{ .Values.service.name }} 
+  name: {{ .Values.service.name }}
   labels:
     chart: "{{ .Chart.Name | trunc 63 }}"
-    chartVersion: "{{ .Chart.Version | trunc 63 }}" 
-    visualize: "true" 
-    app: {{ .Values.service.name }} 
+    chartVersion: "{{ .Chart.Version | trunc 63 }}"
+    visualize: "true"
+    app: {{ .Values.service.name }}
 spec:
-  replicas: {{ .Values.replicaCount }} 
-  selector: 
+  replicas: {{ .Values.replicaCount }}
+  selector:
     matchLabels:
       app: {{ .Values.service.name }}
   template:
     metadata:
       labels:
         app: {{ .Values.service.name }}
-        visualize: "true" 
+        visualize: "true"
     spec:
+{{- if not .Values.eksCluster }}
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -30,15 +34,16 @@ spec:
                 values:
                 - {{ .Values.service.name }}
             topologyKey: "kubernetes.io/hostname"
-      containers: 
-      - name: {{ .Values.service.name }} 
+{{- end }}
+      containers:
+      - name: {{ .Values.service.name }}
         image: "{{ .Values.image.repository }}:{{ .Chart.Version }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        env: 
+        env:
         ports:
         - containerPort: 80
-        livenessProbe: 
-          tcpSocket: 
+        livenessProbe:
+          tcpSocket:
             port: 80
           initialDelaySeconds: 5
         volumeMounts:

@@ -6,6 +6,7 @@ service:
   hasHealthcheck: "false"
   certificateAwsArn: "" # The ARN of the aws certificate use by the ELB created for this service
   htpasswdSecret: "varnish-auth" # The Kubernetes secret containing the contents of the .htpasswd file used for authentication.
+eksCluster: false
 replicaCount: 2
 image:
   repository: coco/delivery-varnish
