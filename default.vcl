@@ -91,6 +91,16 @@ backend upp_content_collection_validator {
   .port = "8080";
 }
 
+backend upp_internal_content_placeholder_validator {
+  .host = "upp-internal-content-placeholder-validator";
+  .port = "8080";
+}
+
+backend upp_content_placeholder_validator {
+  .host = "upp-content-placeholder-validator";
+  .port = "8080";
+}
+
 backend upp_schema_reader {
   .host = "upp-schema-reader";
   .port = "8080";
@@ -187,18 +197,24 @@ sub vcl_recv {
         } elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-article-internal\+json.*$") {
             set req.url = "/validate";
             set req.backend_hint = upp_internal_article_validator;
-        }elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-image(-set)?\+json.*$") {
+        } elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-image(-set)?\+json.*$") {
             set req.url = "/validate";
             set req.backend_hint = upp_image_validator;
-        }elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-graphic\+json.*$") {
+        } elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-graphic\+json.*$") {
             set req.url = "/validate";
             set req.backend_hint = upp_image_validator;
-        }elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-list\+json.*$") {
+        } elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-list\+json.*$") {
             set req.url = "/validate";
             set req.backend_hint = upp_list_validator;
-        }elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-content-collection\+json.*$") {
+        } elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-content-collection\+json.*$") {
             set req.url = "/validate";
             set req.backend_hint = upp_content_collection_validator;
+        } elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-content-placeholder\+json.*$") {
+            set req.url = "/validate";
+            set req.backend_hint = upp_content_placeholder_validator;
+        } elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-content-placeholder-internal\+json.*$") {
+            set req.url = "/validate";
+            set req.backend_hint = upp_internal_content_placeholder_validator;
         }
     } elseif (req.url ~ "^\/schemas.*$") {
             set req.backend_hint = upp_schema_reader;
