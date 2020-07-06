@@ -73,7 +73,7 @@ FullyAutomated
 
 ## Data Recovery Details
 
-Data for requests is stored in Splunk. Authentification secrets are encrypted and stored in Publishing clusters and in emergency LastPass note "UPP - k8s Basic Auth".
+Data for requests is stored in Splunk. Authentification secrets are encrypted and stored in Delivery clusters and in emergency LastPass note "UPP - k8s Basic Auth".
 
 ## Release Process Type
 
