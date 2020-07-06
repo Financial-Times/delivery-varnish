@@ -1,4 +1,4 @@
-# UPP - Publish varnish
+# UPP - Delivery Varnish
 
 Delivery varnish is the main entry point in the delivery cluster. It performs authentication when needed, caching, and routes traffic to the cluster's applications.
 
