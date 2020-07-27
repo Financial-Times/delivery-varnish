@@ -51,6 +51,11 @@ backend internal_apps_routing_varnish {
   .port = "80";
 }
 
+backend ccf_gateway {
+  .host = "ccf-gateway";
+  .port = "8080";
+}
+
 backend content_search_api_port {
   .host = "content-search-api-port";
   .port = "8080";
@@ -143,7 +148,10 @@ sub vcl_hash {
 
 sub vcl_recv {
     # Remove all cookies; we don't need them, and setting cookies bypasses varnish caching.
-    unset req.http.Cookie;
+    # Skip removal for /ccf-ui, the backend needs cookies for authentication
+    if (req.url !~ "^\/ccf-ui.*$") {
+        unset req.http.Cookie;
+    }
 
     # allow PURGE from localhost and 10.2...
     if (req.method == "PURGE") {
@@ -163,6 +171,13 @@ sub vcl_recv {
 
     //dedup leading slashes
     set req.url = regsub(req.url, "^\/+(.*)$","/\1");
+
+    // Allow ccf-ui to pass without requiring auth.
+    if (req.url ~ "^\/ccf-ui.*$") {
+        set req.backend_hint = ccf_gateway;
+        return (pass);
+    }
+
 
     // allow notifications-push health and gtg checks to pass without requiring auth
     if ((req.url ~ "^\/__notifications-push/__health.*$") || (req.url ~ "^\/__notifications-push/__gtg.*$")) {
