@@ -51,11 +51,6 @@ backend internal_apps_routing_varnish {
   .port = "80";
 }
 
-backend ccf_gateway {
-  .host = "ccf-gateway";
-  .port = "8080";
-}
-
 backend content_search_api_port {
   .host = "content-search-api-port";
   .port = "8080";
@@ -174,8 +169,8 @@ sub vcl_recv {
 
     // Allow ccf-ui to pass without requiring auth.
     if (req.url ~ "^\/ccf-ui.*$") {
-        set req.backend_hint = ccf_gateway;
-        return (pass);
+        set req.backend_hint = internal_apps_routing_varnish;
+        return (pipe);
     }
 
 
