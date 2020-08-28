@@ -153,8 +153,8 @@ sub vcl_hash {
 
 sub vcl_recv {
     # Remove all cookies; we don't need them, and setting cookies bypasses varnish caching.
-    # Skip removal for /ccf-ui, the backend needs cookies for authentication
-    if (req.url !~ "^\/ccf-ui.*$") {
+    # Skip removal for /ccf, the backend needs cookies for authentication
+    if (req.url !~ "^\/ccf.*$") {
         unset req.http.Cookie;
     }
 
@@ -177,8 +177,8 @@ sub vcl_recv {
     //dedup leading slashes
     set req.url = regsub(req.url, "^\/+(.*)$","/\1");
 
-    // Allow ccf-ui to pass without requiring auth.
-    if (req.url ~ "^\/ccf-ui.*$") {
+    // Allow /ccf to pass without requiring auth. It has authentication of its own.
+    if (req.url ~ "^\/ccf.*$") {
         set req.backend_hint = internal_apps_routing_varnish;
         return (pipe);
     }
