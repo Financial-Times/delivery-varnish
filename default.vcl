@@ -206,12 +206,7 @@ sub vcl_recv {
         return (pass);
     }
 
-    if ((req.url ~ "^\/content-preview.*$") || (req.url ~ "^\/internalcontent-preview.*$")) {
-        if (vsthrottle.is_denied(client.identity, 2, 1s)) {
-    	    # Client has exceeded 2 reqs per 1s
-    	    return (synth(429, "Too Many Requests"));
-        }
-    } elseif (req.url ~ "^\/content\/notifications-push.*$") {
+    if (req.url ~ "^\/content\/notifications-push.*$") {
         set req.backend_hint = content_notifications_push;
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
         set req.backend_hint = public_content_by_concept_api;
