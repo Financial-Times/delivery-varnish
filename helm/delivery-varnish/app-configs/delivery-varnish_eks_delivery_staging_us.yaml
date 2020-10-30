@@ -2,7 +2,6 @@
 service:
   name: delivery-varnish
   certificateAwsArn: "arn:aws:acm:us-east-1:469211898354:certificate/58bea0ec-c4c5-4d21-9009-c086e5cac77f"
-eksCluster: true
 elb:
   tags: "systemCode=upp,teamDL=universal.publishing.platform@ft.com,environment=t"
 
