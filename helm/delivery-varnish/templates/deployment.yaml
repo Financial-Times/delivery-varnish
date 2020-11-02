@@ -1,9 +1,5 @@
 ##this is an example deployment.yaml that should be customized in order to meet the configuration for app k8s deployment
-{{- if .Values.eksCluster }}
 apiVersion: apps/v1
-{{- else }}
-apiVersion: extensions/v1beta1
-{{- end }}
 kind: Deployment
 metadata:
   name: {{ .Values.service.name }}
@@ -23,7 +19,6 @@ spec:
         app: {{ .Values.service.name }}
         visualize: "true"
     spec:
-{{- if not .Values.eksCluster }}
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -34,7 +29,6 @@ spec:
                 values:
                 - {{ .Values.service.name }}
             topologyKey: "kubernetes.io/hostname"
-{{- end }}
       containers:
       - name: {{ .Values.service.name }}
         image: "{{ .Values.image.repository }}:{{ .Chart.Version }}"
