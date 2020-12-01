@@ -2,6 +2,8 @@
 service:
   name: delivery-varnish
   certificateAwsArn: "arn:aws:acm:eu-west-1:469211898354:certificate/c9fc4ada-63ee-4951-b1ea-429ba586cbf7"
+  external_dns_hostname: "upp-staging-delivery-eu.upp.ft.com"
+
 elb:
   tags: "systemCode=upp,teamDL=universal.publishing.platform@ft.com,environment=t"
 
