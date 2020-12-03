@@ -145,9 +145,13 @@ sub vcl_init {
     healthdirector.add_backend(health2.backend(), 1);
 }
 
+#Add VPC CIDRs for AWS EKS Test and Prod EU/US
 acl purge {
     "localhost";
-    "10.2.0.0"/16;
+    "10.169.0.0"/18;
+    "10.168.0.0"/18;
+    "10.169.64.0"/18;
+    "10.168.64.0"/18;
 }
 
 sub vcl_hash {
