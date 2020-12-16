@@ -10,3 +10,7 @@ replicaCount: 2
 image:
   repository: coco/delivery-varnish
   pullPolicy: IfNotPresent
+resources:
+ requests:
+   memory: 260Mi
+   cpu: 106m
