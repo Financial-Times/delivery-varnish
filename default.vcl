@@ -264,6 +264,12 @@ sub vcl_recv {
         } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-audio\+json.*$") {
             set req.url = "/validate";
             set req.backend_hint = upp_audio_validator;
+        } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-content-placeholder\+json.*$") {
+            set req.url = "/validate";
+            set req.backend_hint = upp_audio_validator;
+        } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-content-placeholder-internal\+json.*$") {
+            set req.url = "/validate";
+            set req.backend_hint = upp_audio_validator;
         }
     } elseif (req.url ~ "^\/schemas.*$") {
             set req.backend_hint = upp_schema_reader;
