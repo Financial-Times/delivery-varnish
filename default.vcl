@@ -163,7 +163,7 @@ sub vcl_hash {
 sub vcl_recv {
     # Remove all cookies; we don't need them, and setting cookies bypasses varnish caching.
     # Skip removal for /ccf and /portal, the backend needs cookies for authentication
-    if ((req.url !~ "^\/ccf.*$") && (req.url !~ "^\/portal.*$")) {
+    if ((req.url !~ "^\/ccf\/") && (req.url !~ "^\/portal\/")) {
         unset req.http.Cookie;
     }
 
@@ -187,7 +187,7 @@ sub vcl_recv {
     set req.url = regsub(req.url, "^\/+(.*)$","/\1");
 
     // Allow /ccf and /portal to pass without requiring auth. They have authentication of their own.
-    if ((req.url ~ "^\/ccf.*$") || (req.url ~ "^\/portal.*$")) {
+    if ((req.url ~ "^\/ccf\/") || (req.url ~ "^\/portal\/$") || (req.url ~ "^\/portal\/api\/") || (req.url ~ "^\/portal\/.+(\/|\.ico|\.css|\.html|\.js|\.js\.map|\.json|\.png|\.seq|\.sh|\.sq|\.txt|\.xml)$")) {
         set req.backend_hint = internal_apps_routing_varnish;
         return (pipe);
     }
