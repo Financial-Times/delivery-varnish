@@ -1,0 +1,91 @@
+Vmod-basicauth NEWS -- history of user-visible changes. 2020-04-09
+See the end of file for copying conditions.
+
+Please send Vmod-basicauth bug reports to <gray@gnu.org>
+
+Version 1.9, 2020-04-09
+
+* Support for Varnish versions 6.0.0 - 6.4.0
+
+Support for earlier versions has been withdrawn.
+
+
+Version 1.8, 2019-02-15
+
+* Minor change
+
+
+Version 1.7, 2018-12-10
+
+* Support for Varnish 6.0.2
+
+
+Version 1.6, 2017-10-26
+
+* Fixed coredump on receiving a valid username with a wrong password
+
+* Improved testsute
+
+* Doesn't require presence of the crypt_r function
+
+
+Version 1.5, 2017-08-10
+
+* Support for Varnish 5.1
+
+
+Version 1.4, 2017-08-06
+
+* Support for Varnish 4.1
+
+* The --with-varnish-source option has been withdrawn
+
+The configure script relies on pkg-config to determine the location of
+Varnish header files and libraries.
+
+
+Version 1.3, 2014-11-13
+
+Support for VCL 4.0
+
+Version 1.2, 2013-10-19
+
+* Improve documentation.
+
+* Remove --with-vmod-dir configure option
+
+Varnish install location is used by default.
+
+
+Version 1.1, 2013-07-09
+
+Implement SHA1 passwords.
+
+
+Version 1.0, 2013-07-07
+
+Initial release.
+
+
+Copyright information:
+
+Copyright (C) 2013-2018 Sergey Poznyakoff
+
+   Permission is granted to anyone to make or distribute verbatim copies
+   of this document as received, in any medium, provided that the
+   copyright notice and this permission notice are preserved,
+   thus giving the recipient permission to redistribute in turn.
+
+   Permission is granted to distribute modified versions
+   of this document, or of portions of it,
+   under the above conditions, provided also that they
+   carry prominent notices stating who last changed them.
+
+Local variables:
+mode: outline
+paragraph-separate: "[	]*$"
+eval: (add-hook 'write-file-hooks 'time-stamp)
+time-stamp-start: "changes. "
+time-stamp-format: "%:y-%02m-%02d"
+time-stamp-end: "\n"
+end:

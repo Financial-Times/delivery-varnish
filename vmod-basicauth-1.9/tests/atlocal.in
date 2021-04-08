@@ -1,0 +1,7 @@
+# @configure_input@                                     -*- shell-script -*-
+# Configurable variable values for vmod_basicauth test suite.
+# Copyright (C) 2017 Sergey Poznyakoff
+
+PATH=@abs_builddir@:@abs_top_builddir@/src:@abs_top_srcdir@/build-aux:$top_srcdir:$srcdir:@VARNISH_SBINDIR@:$PATH
+VARNISHTEST=@VARNISHTEST@
+VARNISHD=@VARNISHD@

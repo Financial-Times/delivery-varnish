@@ -1,0 +1,219 @@
+2020-04-09  Automatically generated  <gray@gnu.org>
+
+	HEAD 2452f72418df310275906054cea750a6fc426212.
+
+2020-04-09  Sergey Poznyakoff  <gray@gnu.org>
+
+	Version 1.9.
+
+2020-03-23  Sergey Poznyakoff  <gray@gnu.org>
+
+	Works with Varnish 6.3.2.
+
+2019-02-15  Sergey Poznyakoff  <gray@gnu.org>
+
+	Version 1.9. Fix section number in the man file.
+
+2018-12-10  Sergey Poznyakoff  <gray@gnu.org>
+
+	Support for varnish 6.0.2.
+
+2017-10-26  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Fix compiler warnings in md5.c.
+
+2017-10-26  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Update manpage.
+
+2017-10-26  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Version 1.6.
+
+2017-10-25  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Check for NULL returns from crypt, crypt_r and apr_md5_encode.
+
+2017-10-25  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Test for the presence of crypt.h and crypt_r call. Improve the
+	testsuite.
+
+2017-08-10  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Update acvmod to suppresss spurious warning message.
+
+2017-08-10  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Support for varnish 5.1.
+
+	* configure.ac: Set version 1.5
+	(AC_VMOD_BASENAME): New subst variable.
+	* NEWS: Document changes.
+	* README: Document changes.
+	* acvmod: Updated.
+	* tests/Makefile.am: Define AT_VMOD_BASENAME in package.m4
+	* tests/atlocal.in: Add @VARNISH_SBINDIR@ to PATH.
+	* tests/aprmd5.at: Update.
+	* tests/crypt.at: Update.
+	* tests/plain.at: Update.
+	* tests/sha1.at: Update.
+
+2017-08-06  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Version 1.4.
+
+2017-08-06  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	README: fix the Installation section.
+
+2017-08-05  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Update acvmode. Rewrite the testsuite.
+
+2016-01-24  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Fix typo in NEWS.
+
+2016-01-23  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Varnish 4.1.
+
+	* .gitmodules: New file.
+	* acvmod: New submodule.
+	* bootstrap: Update.
+	* Makefile.am (ACLOCAL_AMFLAGS): Add acvmod
+	* configure.ac: Use AM_VARNISHAPI instead of inlining the
+	related code. Enable silent rules. Set version number
+	1.0.90-4.1.0
+	* src/Makefile.am: Enable silent rules.
+	* tests/Makefile.am: Likewise. 
+	* src/vmod_basicauth.c (get_priv_data): New function.
+	* src/vmod_basicauth.vcc: Remove init
+	(match): Use PRIV_TASK. 
+	* NEWS: Update
+
+2016-01-09  Michael Kaminski  <michael.kaminski@nytimes.com>
+
+	Bugfix.
+
+	* src/vmod_basicauth.c (match): Fix length computation.
+
+2015-01-30  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Update manpage.
+
+2014-11-13  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Update version number in manpage.
+
+2014-11-13  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Update configure.ac.
+
+2014-11-13  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Version 1.3.
+
+2014-11-10  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Update manpage.
+
+2014-11-01  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Report version of varnish at the end of configure.
+
+2014-11-01  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Add missing copyright headers.
+
+2014-11-01  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Update copyright years.
+
+2014-11-01  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Support for VCL 4.0.
+
+	* NEWS: Update.
+	* configure.ac: Version 1.2.90 Detect varnish version.
+	* src/.gitignore: Update.
+	* src/Makefile.am: Always build vcc_if.c and vcc_if.h, don't
+	include them in the distribution.
+	(.vcc.vcc3): New implicit rule for VCL 3.0
+	* src/vmod_basicauth.c: Include config.h. Define varnish
+	datatypes depending on the value of VARNISHVERSION.
+	(vmod_match): Change declaration.
+	* src/vmod_basicauth.vcc: Rewrite.
+
+2013-10-19  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Raise version number in the docs.
+
+2013-10-19  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Version 1.2.
+
+2013-10-19  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Get rid of the --with-vmod-dir option.
+
+	* Makefile.am: Add default options for distcheck.
+	* configure.ac: Remove --with-vmod-dir, default to the standard
+	Varnish module location, Provide the --without-vmoddir option
+	for use in distcheck.
+	* README: Update.
+
+2013-07-29  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Use EX/EE for examples in the manpage.
+
+2013-07-26  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Update docs. Fix project name discrepancies.
+
+	* src/vmod_basicauth.3: Include vmod-basicauth.3
+	* src/vmod-basicauth.3: New file. 
+	* configure.ac: Update
+	* src/Makefile.am: Update
+	* src/vmod_basicauth.c: Update
+
+2013-07-18  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Fix Makefile.
+
+	* src/Makefile.am: Add BUILT_SOURCES
+
+2013-07-09  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Version 1.1.
+
+	* NEWS: Update.
+	* configure.ac: Update.
+
+2013-07-08  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Implement SHA1 passwords.
+
+	* src/sha1.c: New file.
+	* src/sha1.h: New file.
+	* src/Makefile.am: Add new files.
+	* src/vmod_basicauth.c (base64_decode): Fix bound checking.
+	(sha1_match): New function.
+	(match_tab): Add SHA1 method.
+	* tests/test03.vtc: New test.
+	* tests/Makefile.am: Add new file.
+	* tests/htpasswd: Add SHA1 password. 
+	* README: Update.
+	* src/vmod_basicauth.3: Update.
+
+2013-07-08  Sergey Poznyakoff  <gray@gnu.org.ua>
+
+	Initial commit.
+
+
+Local Variables:
+mode: change-log
+version-control: never
+buffer-read-only: t
+End:

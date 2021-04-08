@@ -1,0 +1,92 @@
+.\" This file is part of Vmod-basicauth -*- nroff -*-
+.\" Copyright (C) 2013-2020 Sergey Poznyakoff
+.\"
+.\" Vmod-basicauth is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 3, or (at your option)
+.\" any later version.
+.\"
+.\" Vmod-basicauth is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with vmod-basicauth.  If not, see <http://www.gnu.org/licenses/>.
+.TH VMOD-BASICAUTH 3 "April 9, 2020" "VMOD-BASICAUTH" "User Reference"
+.SH NAME
+vmod-basicauth \- Basic HTTP authentication
+.SH SYNOPSIS
+.B import basicauth;
+
+.BI "BOOL basicauth.match(STRING " passfile ", STRING " authstr );
+.SH DESCRIPTION
+The
+.B vmod\-basicauth
+module implements basic HTTP authentication against the password file
+created using the
+.BR htpasswd (1)
+command.
+.PP
+Four kinds of password hashes are supported:
+Apache MD5 (\fB$apr1$\fR),
+.BR crypt (3),
+.BR SHA1 ,
+and plaintext.
+.PP
+The \fBmatch\fR function returns \fBTRUE\fR or \fBFALSE\fR depending on
+whether the authentication succeeds or not.  The \fIpassfile\fR argument
+supplies the name of the password file to use.  The \fIauthstr\fR argument
+is the authentication string (normally, the value of the
+\fBAuthorization\fR HTTP header.
+.PP
+.SS Example: 
+.PP
+.EX
+sub vcl_recv {
+    if (!basicauth.match("/var/www/.htpasswd",
+                         req.http.Authorization)) {
+        return (synth(401, "Restricted"));
+    }
+}
+
+sub vcl_synth {
+    if (resp.status == 401) {
+        set resp.http.WWW-Authenticate =
+            {"Basic realm="Restricted area""};
+    }
+}    
+.EE
+.\" The MANCGI variable is set by man.cgi script on Ulysses.
+.\" The download.inc file contains the default DOWNLOAD section
+.\" for man-based doc pages.
+.if "\V[MANCGI]"WEBDOC" \{\
+.	ds package vmod-basicauth
+.	ds version 1.9
+.	so download.inc
+\}
+.SH "SEE ALSO"
+.BR vcl (7),
+.BR varnishd (1).
+.SH AUTHORS
+Sergey Poznyakoff
+.SH "BUG REPORTS"
+Report bugs to <gray@gnu.org>.
+.SH COPYRIGHT
+Copyright \(co 2013-2020 Sergey Poznyakoff
+.br
+.na
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+.br
+.ad
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+.\" Local variables:
+.\" eval: (add-hook 'write-file-hooks 'time-stamp)
+.\" time-stamp-start: ".TH [A-Z_][A-Z0-9_.-]* [0-9] \""
+.\" time-stamp-format: "%:B %:d, %:y"
+.\" time-stamp-end: "\""
+.\" time-stamp-line-limit: 20
+.\" end:
+
+	      
