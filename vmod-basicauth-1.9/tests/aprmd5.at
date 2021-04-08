@@ -1,0 +1,44 @@
+# This file is part of vmod-basicauth
+# Copyright (C) 2013-2017 Sergey Poznyakoff
+#
+# Vmod-basicauth is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# Vmod-basicauth is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with vmod-basicauth.  If not, see <http://www.gnu.org/licenses/>.
+
+AT_SETUP([APR MD5])
+AT_KEYWORDS([APR MD5])
+AT_VARNISHTEST([
+	sub vcl_deliver {
+		set resp.http.result = basicauth.match("\${vmod_topsrc}/tests/htpasswd", "Basic bWV0aG9kLW1kNTpndWVzc21lLW1kNQ==");
+	}
+],
+[	txreq -url "/"
+	rxresp
+	expect resp.http.result == true
+],
+[       rxreq
+        txresp
+])
+AT_VARNISHTEST([
+	sub vcl_deliver {
+		set resp.http.result = basicauth.match("\${vmod_topsrc}/tests/htpasswd", "Basic bWV0aG9kLW1kNTp3cm9uZy1wYXNzd29yZAo=");
+	}
+],
+[	txreq -url "/"
+	rxresp
+	expect resp.http.result == false
+],
+[       rxreq
+        txresp
+])
+AT_CLEANUP
+
