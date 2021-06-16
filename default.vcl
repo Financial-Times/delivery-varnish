@@ -126,6 +126,11 @@ backend upp_internal_live_blog_package_validator {
   .port = "8080";
 }
 
+backend upp_page_validator {
+  .host = "upp-page-validator";
+  .port = "8080";
+}
+
 backend upp_schema_reader {
   .host = "upp-schema-reader";
   .port = "8080";
@@ -269,6 +274,9 @@ sub vcl_recv {
         } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-audio\+json.*$") {
             set req.url = "/validate";
             set req.backend_hint = upp_audio_validator;
+        } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-page\+json.*$") {
+            set req.url = "/validate";
+            set req.backend_hint = upp_page_validator;
         }
     } elseif (req.url ~ "^\/schemas.*$") {
             set req.backend_hint = upp_schema_reader;
