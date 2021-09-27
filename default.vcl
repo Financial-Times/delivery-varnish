@@ -81,6 +81,16 @@ backend upp_image_validator {
   .port = "8080";
 }
 
+backend upp_image_set_validator {
+  .host = "upp-image-set-validator";
+  .port = "8080";
+}
+
+backend upp_graphic_validator {
+  .host = "upp-graphic-validator";
+  .port = "8080";
+}
+
 backend upp_list_validator {
   .host = "upp-list-validator";
   .port = "8080";
@@ -241,12 +251,15 @@ sub vcl_recv {
         } elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-article-internal\+json.*$") {
             set req.url = "/validate";
             set req.backend_hint = upp_internal_article_validator;
-        } elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-image(-set)?\+json.*$") {
+        } elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-image\+json.*$") {
             set req.url = "/validate";
             set req.backend_hint = upp_image_validator;
+        } elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-image-set\+json.*$") {
+            set req.url = "/validate";
+            set req.backend_hint = upp_image_set_validator;
         } elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-graphic\+json.*$") {
             set req.url = "/validate";
-            set req.backend_hint = upp_image_validator;
+            set req.backend_hint = upp_graphic_validator;
         } elseif (req.http.Content-Type ~ "^application\/vnd\.ft-upp-list\+json.*$") {
             set req.url = "/validate";
             set req.backend_hint = upp_list_validator;
