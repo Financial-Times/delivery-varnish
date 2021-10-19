@@ -219,9 +219,13 @@ sub vcl_recv {
 
 
     // allow notifications-push health and gtg checks to pass without requiring auth
-    if ((req.url ~ "^\/__notifications-push/__health.*$") || (req.url ~ "^\/__notifications-push/__gtg.*$")) {
+    if ((req.url ~ "^\/__(list-)?notifications-push\/__health.*$") || (req.url ~ "^\/__(list-)?notifications-push\/__gtg.*$")) {
+        if (req.url ~ "list") {
+            set req.backend_hint = list_notifications_push;
+        } else {
+            set req.backend_hint = content_notifications_push;
+        }
         set req.url = regsub(req.url, "^\/__[\w-]*\/(.*)$", "/\1");
-        set req.backend_hint = content_notifications_push;
         return (pass);
     }
 
