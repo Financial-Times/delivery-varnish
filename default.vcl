@@ -17,6 +17,11 @@ backend content_notifications_push {
   .port = "8599";
 }
 
+backend list_notifications_push {
+  .host = "list-notifications-push";
+  .port = "8599";
+}
+
 backend health_check_service {
   .host = "upp-aggregate-healthcheck";
   .port = "8080";
@@ -214,9 +219,13 @@ sub vcl_recv {
 
 
     // allow notifications-push health and gtg checks to pass without requiring auth
-    if ((req.url ~ "^\/__notifications-push/__health.*$") || (req.url ~ "^\/__notifications-push/__gtg.*$")) {
+    if ((req.url ~ "^\/__(list-)?notifications-push\/__health.*$") || (req.url ~ "^\/__(list-)?notifications-push\/__gtg.*$")) {
+        if (req.url ~ "list") {
+            set req.backend_hint = list_notifications_push;
+        } else {
+            set req.backend_hint = content_notifications_push;
+        }
         set req.url = regsub(req.url, "^\/__[\w-]*\/(.*)$", "/\1");
-        set req.backend_hint = content_notifications_push;
         return (pass);
     }
 
@@ -229,8 +238,10 @@ sub vcl_recv {
         set req.backend_hint = healthdirector.backend();
         return (pass);
     }
-
-    if (req.url ~ "^\/content\/notifications-push.*$") {
+	
+    if (req.url ~ "^\/lists\/notifications-push.*$") {
+        set req.backend_hint = list_notifications_push;
+    } elseif (req.url ~ "^\/content\/notifications-push.*$") {
         set req.backend_hint = content_notifications_push;
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
         set req.backend_hint = public_content_by_concept_api;
