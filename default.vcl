@@ -22,6 +22,11 @@ backend list_notifications_push {
   .port = "8599";
 }
 
+backend page_notifications_push {
+  .host = "page-notifications-push";
+  .port = "8599";
+}
+
 backend health_check_service {
   .host = "upp-aggregate-healthcheck";
   .port = "8080";
@@ -219,9 +224,11 @@ sub vcl_recv {
 
 
     // allow notifications-push health and gtg checks to pass without requiring auth
-    if ((req.url ~ "^\/__(list-)?notifications-push\/__health.*$") || (req.url ~ "^\/__(list-)?notifications-push\/__gtg.*$")) {
+    if ((req.url ~ "^\/__(list-|page-)?notifications-push\/__health.*$") || (req.url ~ "^\/__(list-|page-)?notifications-push\/__gtg.*$")) {
         if (req.url ~ "list") {
             set req.backend_hint = list_notifications_push;
+        } elseif (req.url ~ "page") {
+            set req.backend_hint = page_notifications_push;
         } else {
             set req.backend_hint = content_notifications_push;
         }
@@ -238,8 +245,10 @@ sub vcl_recv {
         set req.backend_hint = healthdirector.backend();
         return (pass);
     }
-	
-    if (req.url ~ "^\/lists\/notifications-push.*$") {
+
+	if (req.url ~ "^\/pages\/notifications-push.*$") {
+        set req.backend_hint = page_notifications_push;
+    } elseif (req.url ~ "^\/lists\/notifications-push.*$") {
         set req.backend_hint = list_notifications_push;
     } elseif (req.url ~ "^\/content\/notifications-push.*$") {
         set req.backend_hint = content_notifications_push;
