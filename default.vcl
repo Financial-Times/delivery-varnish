@@ -161,11 +161,6 @@ backend upp_schema_reader {
   .port = "8080";
 }
 
-backend public_pages_api {
-  .host = "public-pages-api";
-  .port = "8080";
-}
-
 sub vcl_init {
     # Instantiate sm1, sm2 for backends tile1, tile2
     # with 10 blacklisted objects as the threshold for marking the
@@ -321,8 +316,6 @@ sub vcl_recv {
         }
     } elseif (req.url ~ "^\/schemas.*$") {
             set req.backend_hint = upp_schema_reader;
-    } elseif (req.url ~ "^\/pages.*$") {
-            set req.backend_hint = public_pages_api;
     }
 
     if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
