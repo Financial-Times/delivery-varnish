@@ -254,6 +254,7 @@ sub vcl_recv {
     }
 
     if (req.url ~ "^\/__cm-enriched-content-concept-ingester.*$") {
+        std.syslog(0, "Enriched Content Backend Called");
         set req.backend_hint = enriched_content_concept_ingester;
 	} elseif (req.url ~ "^\/pages\/notifications-push.*$") {
         set req.backend_hint = page_notifications_push;
