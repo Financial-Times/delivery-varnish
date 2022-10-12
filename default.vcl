@@ -12,7 +12,7 @@ backend default {
     .port = "8080";
 }
 
-backend enriched-content-concept-ingester-service {
+backend enriched_content_concept_ingester {
   .host = "cm-enriched-content-concept-ingester";
   .port = "8080";
   .between_bytes_timeout = 6000s;
@@ -253,7 +253,9 @@ sub vcl_recv {
         return (pass);
     }
 
-	if (req.url ~ "^\/pages\/notifications-push.*$") {
+    if (req.url ~ "^\/__cm-enriched-content-concept-ingester.*$") {
+        set req.backend_hint = enriched_content_concept_ingester;
+	} elseif (req.url ~ "^\/pages\/notifications-push.*$") {
         set req.backend_hint = page_notifications_push;
     } elseif (req.url ~ "^\/lists\/notifications-push.*$") {
         set req.backend_hint = list_notifications_push;
