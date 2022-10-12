@@ -10,6 +10,8 @@ import directors;
 backend default {
     .host = "api-policy-component";
     .port = "8080";
+    .first_byte_timeout = "600s";
+    .between_bytes_timeout = "600s";
 }
 
 backend content_notifications_push {
