@@ -10,8 +10,13 @@ import directors;
 backend default {
     .host = "api-policy-component";
     .port = "8080";
-    .first_byte_timeout = "600s";
-    .between_bytes_timeout = "600s";
+}
+
+backend enriched-content-concept-ingester-service {
+  .host = "cm-enriched-content-concept-ingester";
+  .port = "8080";
+  .between_bytes_timeout = 6000s;
+  .first_byte_timeout = 6000s;
 }
 
 backend content_notifications_push {
