@@ -214,6 +214,14 @@ sub vcl_recv {
         return(synth(200, "robots"));
     }
 
+    // K8s probes
+    if (req.url == "\/__varnish-health") {
+       return(synth(200));
+    }
+    if (req.url == "\/__varnish-ready") {
+        return(synth(200));
+    }
+
     if ((!req.http.X-Original-Request-URL) && req.http.X-Forwarded-For && req.http.Host) {
         set req.http.X-Original-Request-URL = "https://" + req.http.Host + req.url;
     }

@@ -36,10 +36,23 @@ spec:
         env:
         ports:
         - containerPort: 80
-        livenessProbe:
-          tcpSocket:
+        startupProbe:
+          httpGet:
+            path: '/__varnish-health'
             port: 80
-          initialDelaySeconds: 5
+          initialDelaySeconds: 10
+          periodSeconds: 3
+        livenessProbe:
+          httpGet:
+            path: '/__varnish-health'
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 1
+        readinessProbe:
+          httpGet:
+            path: '/__varnish-ready'
+            port: 80
+          periodSeconds: 1
         volumeMounts:
         - name: varnish-htpasswd
           mountPath: /etc/varnish/auth
