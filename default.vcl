@@ -161,11 +161,6 @@ backend upp_live_event_validator {
   .port = "8080";
 }
 
-backend cm_live_events_api {
-  .host = "cm-live-events-api";
-  .port = "8080";
-}
-
 backend upp_schema_reader {
   .host = "upp-schema-reader";
   .port = "8080";
@@ -330,8 +325,6 @@ sub vcl_recv {
         }
     } elseif (req.url ~ "^\/schemas.*$") {
             set req.backend_hint = upp_schema_reader;
-    } elseif (req.url ~ "^\/live-events.*$") {
-            set req.backend_hint = cm_live_events_api;
     }
 
     if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
