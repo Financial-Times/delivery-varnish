@@ -227,7 +227,7 @@ sub vcl_recv {
     set req.url = regsub(req.url, "^\/+(.*)$","/\1");
 
     // Allow /ccf and /portal to pass without requiring auth. They have authentication of their own.
-    if ((req.url ~ "^\/ccf\/") || (req.url ~ "^\/portal\/$") || (req.url ~ "^\/portal\/specs\/") || (req.url ~ "^\/portal\/api\/") || (req.url ~ "^\/portal\/.+(\/|\.ico|\.css|\.html|\.js|\.js\.map|\.json|\.png|\.seq|\.sh|\.sq|\.txt|\.xml)$") || (req.url ~ "^\/portal\/(docs|concepts|swagger|query-builder)$")) {
+    if ((req.url ~ "^\/ccf\/") || (req.url ~ "^\/portal\/$") || (req.url ~ "^\/portal\/specs\/") || (req.url ~ "^\/portal\/api\/") || (req.url ~ "^\/portal\/.+(\/|\.ico|\.css|\.html|\.js|\.js\.map|\.json|\.png|\.seq|\.sh|\.sq|\.txt|\.xml)$") || (req.url ~ "^\/portal\/(docs.*|concepts|swagger|query-builder)$")) {
         set req.backend_hint = internal_apps_routing_varnish;
         return (pipe);
     }
