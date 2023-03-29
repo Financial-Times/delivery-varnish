@@ -235,17 +235,7 @@ sub vcl_recv {
 
     // allow notifications-push health and gtg checks to pass without requiring auth
     if ((req.url ~ "^\/__(annotation-|list-|page-)?notifications-push\/__health.*$") || (req.url ~ "^\/__(annotation-|list-|page-)?notifications-push\/__gtg.*$")) {
-        if (req.url ~ "list") {
-            set req.backend_hint = list_notifications_push;
-        } elseif (req.url ~ "page") {
-            set req.backend_hint = page_notifications_push;
-        } elseif (req.url ~ "annotation") {
-                    set req.backend_hint = annotation_notifications_push;
-        } else {
-            set req.backend_hint = content_notifications_push;
-        }
-        set req.url = regsub(req.url, "^\/__[\w-]*\/(.*)$", "/\1");
-        return (pass);
+       return(synth(200));
     }
 
     if ((req.url ~ "^\/__health.*$") || (req.url ~ "^\/__gtg.*$")) {
