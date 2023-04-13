@@ -1,28 +1,44 @@
-FROM alpine:3.9
+FROM ubuntu:jammy as build
 
-ENV VARNISHSRC=/usr/include/varnish VMODDIR=/usr/lib/varnish/vmods
+WORKDIR /
 
+# install varnish 6.0-lts dependencies
+RUN apt-get update && \
+    apt-get install -y curl gnupg2 && \
+    curl -L https://packagecloud.io/varnishcache/varnish60lts/gpgkey | apt-key add - && \
+    echo "deb https://packagecloud.io/varnishcache/varnish60lts/ubuntu/ jammy main" | tee /etc/apt/sources.list.d/varnish-cache.list && \
+    apt-get update && \
+    apt-get install -y libgetdns-dev varnish=6.0.11-1~jammy varnish-dev=6.0.11-1~jammy
+
+# install varnish-modules
+RUN apt-get install -y git automake autoconf libtool python3 make docutils-common && \
+    git clone -b 6.0-lts https://github.com/varnish/varnish-modules.git && \
+    cd /varnish-modules && \
+    ./bootstrap && \
+    ./configure --prefix=/build && \
+    make  && \
+    make install
+
+# install vmod-basicauth
 COPY vmod-basicauth-1.9/ /vmod-basicauth
+RUN  cd /vmod-basicauth && \
+    autoreconf -f -i && \
+    ./configure --with-vmoddir="/build/lib/varnish/vmods" && \
+    make && \
+    make install
 
+FROM ubuntu:jammy
 
-RUN apk --update add  varnish-dev git automake autoconf libtool python3 make py-docutils curl jq && apk add --repository http://dl-cdn.alpinelinux.org/alpine/v3.9/main/ varnish~=6.2.1-r0 && ln -s /usr/bin/python3 /usr/bin/python && \
-  mkdir /aclocal && \
-  cd / && \
-  git clone https://github.com/varnish/varnish-modules.git && \
-  cd varnish-modules && \
-  git checkout  f771780801b5cf8b77954226a4f623fac759cd1e && \
-  autoreconf -f -i && \
-  ./bootstrap && \
-  ./configure && \
-  make  && \
-  make install && \
-  cd /vmod-basicauth && \
-  autoreconf -f -i && \
-  ./configure && \
-  make && \
-  make install && \
-  apk del git automake autoconf libtool python3 make py-docutils && \
-  rm -rf /var/cache/apk/* /libvmod-vsthrottle /vmod-basicauth
+# install varnish 6.0-lts dependencies
+RUN apt-get update && \
+    apt-get install -y curl gnupg2 && \
+    curl -L https://packagecloud.io/varnishcache/varnish60lts/gpgkey | apt-key add - && \
+    echo "deb https://packagecloud.io/varnishcache/varnish60lts/ubuntu/ jammy main" | tee /etc/apt/sources.list.d/varnish-cache.list && \
+    apt-get update && \
+    apt-get install -y varnish=6.0.11-1~jammy
+
+COPY --from=build /build/lib/varnish/vmods/ /usr/lib/varnish/vmods/
+COPY --from=build /build/share/ /usr/share/
 
 COPY default.vcl /etc/varnish/default.vcl
 COPY start.sh /start.sh
