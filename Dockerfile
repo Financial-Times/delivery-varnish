@@ -1,18 +1,18 @@
-FROM ubuntu:jammy as build
+FROM ubuntu:bionic as build
 
 WORKDIR /
 
 # install varnish 6.0-lts dependencies
 RUN apt-get update && \
     apt-get install -y curl gnupg2 && \
-    curl -L https://packagecloud.io/varnishcache/varnish60lts/gpgkey | apt-key add - && \
-    echo "deb https://packagecloud.io/varnishcache/varnish60lts/ubuntu/ jammy main" | tee /etc/apt/sources.list.d/varnish-cache.list && \
+    curl -L https://packagecloud.io/varnishcache/varnish62/gpgkey | apt-key add - && \
+    echo "deb https://packagecloud.io/varnishcache/varnish62/ubuntu/ bionic main" | tee /etc/apt/sources.list.d/varnish-cache.list && \
     apt-get update && \
-    apt-get install -y libgetdns-dev varnish=6.0.11-1~jammy varnish-dev=6.0.11-1~jammy
+    apt-get install -y libgetdns-dev varnish=6.2.1-1~bionic varnish-dev=6.2.1-1~bionic
 
 # install varnish-modules
 RUN apt-get install -y git automake autoconf libtool python3 make docutils-common && \
-    git clone -b 6.0-lts https://github.com/varnish/varnish-modules.git && \
+    git clone -b 6.2 https://github.com/varnish/varnish-modules.git && \
     cd /varnish-modules && \
     ./bootstrap && \
     ./configure --prefix=/build && \
@@ -27,15 +27,15 @@ RUN  cd /vmod-basicauth && \
     make && \
     make install
 
-FROM ubuntu:jammy
+FROM ubuntu:bionic
 
 # install varnish 6.0-lts dependencies
 RUN apt-get update && \
     apt-get install -y curl gnupg2 && \
-    curl -L https://packagecloud.io/varnishcache/varnish60lts/gpgkey | apt-key add - && \
-    echo "deb https://packagecloud.io/varnishcache/varnish60lts/ubuntu/ jammy main" | tee /etc/apt/sources.list.d/varnish-cache.list && \
+    curl -L https://packagecloud.io/varnishcache/varnish62/gpgkey | apt-key add - && \
+    echo "deb https://packagecloud.io/varnishcache/varnish62/ubuntu/ bionic main" | tee /etc/apt/sources.list.d/varnish-cache.list && \
     apt-get update && \
-    apt-get install -y varnish=6.0.11-1~jammy
+    apt-get install -y varnish=6.2.1-1~bionic
 
 COPY --from=build /build/lib/varnish/vmods/ /usr/lib/varnish/vmods/
 COPY --from=build /build/share/ /usr/share/
