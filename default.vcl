@@ -258,14 +258,17 @@ sub vcl_recv {
         return (pass);
     }
 
-    if (req.url ~ "^\/annotations\/notifications-push.*$") {
-        set req.backend_hint = annotation_notifications_push;
-	} elseif (req.url ~ "^\/pages\/notifications-push.*$") {
-        set req.backend_hint = page_notifications_push;
-    } elseif (req.url ~ "^\/lists\/notifications-push.*$") {
-        set req.backend_hint = list_notifications_push;
-    } elseif (req.url ~ "^\/content\/notifications-push.*$") {
-        set req.backend_hint = content_notifications_push;
+    if (req.url ~ "^\/(annotations|lists|pages|content)\/notifications-push.*$") {
+        if (req.url ~ "^\/annotations\/notifications-push.*$") {
+            set req.backend_hint = annotation_notifications_push;
+	    } elseif (req.url ~ "^\/pages\/notifications-push.*$") {
+            set req.backend_hint = page_notifications_push;
+        } elseif (req.url ~ "^\/lists\/notifications-push.*$") {
+            set req.backend_hint = list_notifications_push;
+        } elseif (req.url ~ "^\/content\/notifications-push.*$") {
+            set req.backend_hint = content_notifications_push;
+        }
+        return (pipe);
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
         set req.backend_hint = public_content_by_concept_api;
     } elseif (req.url ~ "\/concept\/search.*$") {
