@@ -48,4 +48,8 @@ spec:
       volumes:
       - name: varnish-htpasswd
         secret:
-          secretName: {{ .Values.service.htpasswdSecret }}
+          secretName: doppler-global-secrets
+          items:
+            - key: VARNISH_HTPASSWD
+              path: .htpasswd
+
