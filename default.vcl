@@ -342,6 +342,7 @@ sub vcl_recv {
             set req.url = regsub(req.url, "^\/metadata-quality\/(.*)$", "/\1");
             set req.backend_hint = cm_metadata_quality_api;
     } else if (req.url ~ "^\/concept/lists.*$") {
+            set req.url = regsub(req.url, "^\/concept/lists\/(.*)$", "/\1");
             set req.backend_hint = cm_concept_lists_api;
     }
 
