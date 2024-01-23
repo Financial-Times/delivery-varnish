@@ -344,6 +344,9 @@ sub vcl_recv {
     } else if (req.url ~ "^\/concept\/lists.*$") {
             set req.url = regsub(req.url, "^\/concept\/lists\/(.*)$", "/\1");
             set req.backend_hint = cm_concept_lists_api;
+    } elif(req.url ~ "^\/content\/query.*$") {
+        set req.url = "/search";
+        set req.backend_hint = dynBackend.backend("cm-search-api");
     }
 
     if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
