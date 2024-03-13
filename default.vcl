@@ -181,6 +181,11 @@ backend cm_search_api {
   .port = "8080";
 }
 
+backend public_content_relation_api {
+  .host = "public-content-relation-api";
+  .port = "8080";
+}
+
 sub vcl_init {
     # Instantiate sm1, sm2 for backends tile1, tile2
     # with 10 blacklisted objects as the threshold for marking the
@@ -352,6 +357,8 @@ sub vcl_recv {
     } elif(req.url ~ "^\/content\/query.*$") {
         set req.url = "/search";
         set req.backend_hint = cm_search_api;
+    } elif(req.url ~ "^\/relatedcontent\/.*$") {
+        set req.backend_hint = public_content_relation_api;
     }
 
     if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
