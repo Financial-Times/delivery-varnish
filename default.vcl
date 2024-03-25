@@ -354,11 +354,11 @@ sub vcl_recv {
     } else if (req.url ~ "^\/concept\/lists.*$") {
             set req.url = regsub(req.url, "^\/concept\/lists\/(.*)$", "/\1");
             set req.backend_hint = cm_concept_lists_api;
-    } elif (req.url ~ "^\/content\/query.*$") {
-            set req.url = "/search";
-            set req.backend_hint = cm_search_api;
-    } elif (req.url ~ "^\/relatedcontent\/.*$") {
-            set req.backend_hint = public_content_relation_api;
+    } elif(req.url ~ "^\/content\/query.*$") {
+        set req.url = "/search";
+        set req.backend_hint = cm_search_api;
+    } elif(req.url ~ "^\/relatedcontent\/.*$") {
+        set req.backend_hint = public_content_relation_api;
     }
 
     if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
