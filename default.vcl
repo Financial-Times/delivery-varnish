@@ -351,18 +351,17 @@ sub vcl_recv {
     } elseif (req.url ~ "^\/metadata-quality.*$") {
             set req.url = regsub(req.url, "^\/metadata-quality\/(.*)$", "/\1");
             set req.backend_hint = cm_metadata_quality_api;
-    } else if (req.url ~ "^\/concept\/lists.*$") {
+    } elseif (req.url ~ "^\/concept\/lists.*$") {
             set req.url = regsub(req.url, "^\/concept\/lists\/(.*)$", "/\1");
             set req.backend_hint = cm_concept_lists_api;
-    } else if (req.url ~ "^\/content\/query\/latest.*$") {
-          set req.url = "/search/latest";
-          set req.backend_hint = cm_search_api;
-    }
-    else if (req.url ~ "^\/content\/query.*$") {
-          set req.url = "/search";
-          set req.backend_hint = cm_search_api;
-    } elif(req.url ~ "^\/relatedcontent\/.*$") {
-        set req.backend_hint = public_content_relation_api;
+    } elseif (req.url ~ "^\/content\/query\/latest.*$") {
+            set req.url = "/search/latest";
+            set req.backend_hint = cm_search_api;
+    } elseif (req.url ~ "^\/content\/query.*$") {
+            set req.url = "/search";
+            set req.backend_hint = cm_search_api;
+    } elseif (req.url ~ "^\/relatedcontent\/.*$") {
+            set req.backend_hint = public_content_relation_api;
     }
 
     if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
