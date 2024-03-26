@@ -347,17 +347,17 @@ sub vcl_recv {
             set req.backend_hint = upp_live_event_validator;
         }
     } elseif (req.url ~ "^\/schemas.*$") {
-        set req.backend_hint = upp_schema_reader;
+            set req.backend_hint = upp_schema_reader;
     } elseif (req.url ~ "^\/metadata-quality.*$") {
-        set req.url = regsub(req.url, "^\/metadata-quality\/(.*)$", "/\1");
-        set req.backend_hint = cm_metadata_quality_api;
-    } elseif (req.url ~ "^\/concept\/lists.*$") {
-        set req.url = regsub(req.url, "^\/concept\/lists\/(.*)$", "/\1");
-        set req.backend_hint = cm_concept_lists_api;
+            set req.url = regsub(req.url, "^\/metadata-quality\/(.*)$", "/\1");
+            set req.backend_hint = cm_metadata_quality_api;
+    } else if (req.url ~ "^\/concept\/lists.*$") {
+            set req.url = regsub(req.url, "^\/concept\/lists\/(.*)$", "/\1");
+            set req.backend_hint = cm_concept_lists_api;
     } elseif (req.url ~ "^\/content\/query") {
           set req.url = "/search" + regsub(req.url, "^\/content\/query", "");
           set req.backend_hint = cm_search_api;
-    } elseif (req.url ~ "^\/relatedcontent\/.*$") {
+    } elif (req.url ~ "^\/relatedcontent\/.*$") {
         set req.backend_hint = public_content_relation_api;
     }
 
