@@ -355,15 +355,7 @@ sub vcl_recv {
             set req.url = regsub(req.url, "^\/concept\/lists\/(.*)$", "/\1");
             set req.backend_hint = cm_concept_lists_api;
     } elif(req.url ~ "^\/content\/query.*$") {
-        # Declare the variable at the top level
-        declare local var extracted_group_value;
-        set extracted_group_value = regsub(req.url, "^\/content\/query\/content\/query\/(.*)$", "/\1");
-
-        if (strlen(extracted_group) > 0) {
-        	set req.url = "/search/" + extracted_group_value;
-        } else {
-        	set req.url = "/search";
-        }
+        set req.url = regsub(req.url, "^\/content\/query\/content\/query\/(.*)$", "\/search/\1");
         set req.backend_hint = cm_search_api;
     } elif(req.url ~ "^\/relatedcontent\/.*$") {
         set req.backend_hint = public_content_relation_api;
