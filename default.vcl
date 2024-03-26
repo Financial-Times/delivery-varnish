@@ -355,12 +355,13 @@ sub vcl_recv {
         set req.url = regsub(req.url, "^\/concept\/lists\/(.*)$", "/\1");
         set req.backend_hint = cm_concept_lists_api;
     } elseif (req.url ~ "^\/content\/query\/latest.*$") {
-    // More specific condition first
-        set req.url = "/search/latest";
+        set req.url = regsub(req.url, "^\/content\/query\/latest(.*)$", "/search/latest\1");
         set req.backend_hint = cm_search_api;
-    } elseif (req.url ~ "^\/content\/query.*$") {
-    // More general condition after
+    } elseif (req.url ~ "^\/content\/query\/?$") {
         set req.url = "/search";
+        set req.backend_hint = cm_search_api;
+    } elseif (req.url ~ "^\/content\/query\/(.*)$") {
+        set req.url = regsub(req.url, "^\/content\/query\/(.*)$", "/search/\1");
         set req.backend_hint = cm_search_api;
     } elseif (req.url ~ "^\/relatedcontent\/.*$") {
         set req.backend_hint = public_content_relation_api;
