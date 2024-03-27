@@ -354,7 +354,7 @@ sub vcl_recv {
     } else if (req.url ~ "^\/concept\/lists.*$") {
             set req.url = regsub(req.url, "^\/concept\/lists\/(.*)$", "/\1");
             set req.backend_hint = cm_concept_lists_api;
-    } elif (req.url ~ "^\/content\/query\/content\/query\/latest.*$") {
+    } elif (req.url ~ "^\/content\/query\/latest.*$") {
             set req.url = "/search/latest";
             set req.backend_hint = cm_search_api;
     } elif (req.url ~ "^\/content\/query.*$") {
