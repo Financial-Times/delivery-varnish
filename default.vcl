@@ -288,6 +288,8 @@ sub vcl_recv {
         set req.backend_hint = public_content_by_concept_api;
     } elseif (req.url ~ "\/concept\/search.*$") {
         set req.backend_hint = concept_search_api;
+     } elseif (req.url ~ "^\/concepts\?.*$") {
+        set req.backend_hint = concept_search_api;
     } elseif (req.url ~ "\/content\/suggest/__gtg") {
         set req.url = "/__gtg";
         set req.backend_hint = public_suggestions_api;
