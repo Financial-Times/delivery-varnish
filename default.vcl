@@ -176,6 +176,11 @@ backend upp_content_package_validator {
   .port = "8080";
 }
 
+backend upp_internal_content_package_validator {
+  .host = "upp-internal-content-package-validator";
+  .port = "8080";
+}
+
 backend upp_schema_reader {
   .host = "upp-schema-reader";
   .port = "8080";
@@ -378,6 +383,9 @@ sub vcl_recv {
         } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-content-package\+json.*$") {
             set req.url = "/validate";
             set req.backend_hint = upp_content_package_validator;
+        } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-content-package-internal\+json.*$") {
+            set req.url = "/validate";
+            set req.backend_hint = upp_internal_content_package_validator;
         }
     } elseif (req.url ~ "^\/schemas.*$") {
             set req.backend_hint = upp_schema_reader;
