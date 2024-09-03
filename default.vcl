@@ -161,6 +161,11 @@ backend upp_live_event_validator {
   .port = "8080";
 }
 
+backend upp_clip_set_validator {
+  .host = "upp-clip-set-validator";
+  .port = "8080";
+}
+
 backend upp_schema_reader {
   .host = "upp-schema-reader";
   .port = "8080";
@@ -354,6 +359,9 @@ sub vcl_recv {
         } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-live-event\+json.*$") {
             set req.url = "/validate";
             set req.backend_hint = upp_live_event_validator;
+        } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-clip-set\+json.*$") {
+            set req.url = "/validate";
+            set req.backend_hint = upp_clip_set_validator;
         }
     } elseif (req.url ~ "^\/schemas.*$") {
             set req.backend_hint = upp_schema_reader;
