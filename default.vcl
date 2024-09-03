@@ -186,6 +186,11 @@ backend upp_content_relation_validator {
   .port = "8080";
 }
 
+backend upp_custom_code_component_validator {
+  .host = "upp-custom-code-component-validator";
+  .port = "8080";
+}
+
 backend upp_schema_reader {
   .host = "upp-schema-reader";
   .port = "8080";
@@ -394,6 +399,9 @@ sub vcl_recv {
         } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-content-relation\+json.*$") {
             set req.url = "/validate";
             set req.backend_hint = upp_content_relation_validator;
+        } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-custom-code-component\+json.*$") {
+            set req.url = "/validate";
+            set req.backend_hint = upp_custom_code_component_validator;
         }
     } elseif (req.url ~ "^\/schemas.*$") {
             set req.backend_hint = upp_schema_reader;
