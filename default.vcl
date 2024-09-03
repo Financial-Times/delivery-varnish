@@ -186,6 +186,11 @@ backend public_content_relation_api {
   .port = "8080";
 }
 
+backend relations-api {
+  .host = "relations-api";
+  .port = "8080";
+}
+
 sub vcl_init {
     # Instantiate sm1, sm2 for backends tile1, tile2
     # with 10 blacklisted objects as the threshold for marking the
@@ -286,6 +291,8 @@ sub vcl_recv {
         return (pipe);
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
         set req.backend_hint = public_content_by_concept_api;
+    } elseif (req.url ~ "\/content\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\/relations.*$") {
+        set req.backend_hint = relations-api;
     } elseif (req.url ~ "\/concept\/search.*$") {
         set req.backend_hint = concept_search_api;
     } elseif (req.url ~ "^\/concepts\?.*$") {
