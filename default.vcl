@@ -161,6 +161,36 @@ backend upp_live_event_validator {
   .port = "8080";
 }
 
+backend upp_clip_set_validator {
+  .host = "upp-clip-set-validator";
+  .port = "8080";
+}
+
+backend upp_clip_validator {
+  .host = "upp-clip-validator";
+  .port = "8080";
+}
+
+backend upp_content_package_validator {
+  .host = "upp-content-package-validator";
+  .port = "8080";
+}
+
+backend upp_internal_content_package_validator {
+  .host = "upp-internal-content-package-validator";
+  .port = "8080";
+}
+
+backend upp_content_relation_validator {
+  .host = "upp-content-relation-validator";
+  .port = "8080";
+}
+
+backend upp_custom_code_component_validator {
+  .host = "upp-custom-code-component-validator";
+  .port = "8080";
+}
+
 backend upp_schema_reader {
   .host = "upp-schema-reader";
   .port = "8080";
@@ -354,6 +384,24 @@ sub vcl_recv {
         } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-live-event\+json.*$") {
             set req.url = "/validate";
             set req.backend_hint = upp_live_event_validator;
+        } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-clip-set\+json.*$") {
+            set req.url = "/validate";
+            set req.backend_hint = upp_clip_set_validator;
+        } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-clip\+json.*$") {
+            set req.url = "/validate";
+            set req.backend_hint = upp_clip_validator;
+        } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-content-package\+json.*$") {
+            set req.url = "/validate";
+            set req.backend_hint = upp_content_package_validator;
+        } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-content-package-internal\+json.*$") {
+            set req.url = "/validate";
+            set req.backend_hint = upp_internal_content_package_validator;
+        } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-content-relation\+json.*$") {
+            set req.url = "/validate";
+            set req.backend_hint = upp_content_relation_validator;
+        } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-custom-code-component\+json.*$") {
+            set req.url = "/validate";
+            set req.backend_hint = upp_custom_code_component_validator;
         }
     } elseif (req.url ~ "^\/schemas.*$") {
             set req.backend_hint = upp_schema_reader;
