@@ -76,6 +76,11 @@ backend concept_search_api {
   .port = "8080";
 }
 
+backend public-concepts-api {
+  .host = "public-concepts-api";
+  .port = "8080";
+}
+
 backend public_suggestions_api {
   .host = "public-suggestions-api";
   .port = "8080";
@@ -327,6 +332,8 @@ sub vcl_recv {
         set req.backend_hint = concept_search_api;
     } elseif (req.url ~ "^\/concepts\?.*$") {
         set req.backend_hint = concept_search_api;
+    } elseif (req.url ~ "\/concepts\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}.*$") {
+        set req.backend_hint = public-concepts-api;
     } elseif (req.url ~ "\/content\/suggest/__gtg") {
         set req.url = "/__gtg";
         set req.backend_hint = public_suggestions_api;
