@@ -231,6 +231,11 @@ backend relations-api {
   .port = "8080";
 }
 
+backend concept_suggestions_api {
+  .host = "concept-suggestion-writer-postgres";
+  .port = "8080";
+}
+
 sub vcl_init {
     # Instantiate sm1, sm2 for backends tile1, tile2
     # with 10 blacklisted objects as the threshold for marking the
@@ -433,6 +438,8 @@ sub vcl_recv {
             set req.backend_hint = cm_search_api;
     } elif (req.url ~ "^\/relatedcontent\/.*$") {
             set req.backend_hint = public_content_relation_api;
+    } elif (req.url ~ "^\/ontotext\/suggestions\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\/details.*$") {
+            set req.backend_hint = concept_suggestions_api;
     }
 
     if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
