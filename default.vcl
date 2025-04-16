@@ -236,6 +236,11 @@ backend concept_suggestions_api {
   .port = "8080";
 }
 
+backend cm_content_tree_api {
+  .host = "cm-content-tree-api";
+  .port = "8080";
+}
+
 sub vcl_init {
     # Instantiate sm1, sm2 for backends tile1, tile2
     # with 10 blacklisted objects as the threshold for marking the
@@ -440,6 +445,8 @@ sub vcl_recv {
             set req.backend_hint = public_content_relation_api;
     } elif (req.url ~ "^\/ontotext\/suggestions\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\/details.*$") {
             set req.backend_hint = concept_suggestions_api;
+    } elseif (req.url ~ "\/content-tree\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}.*$") {
+            set req.backend_hint = cm_content_tree_api;
     }
 
     if (!basicauth.match("/etc/varnish/auth/.htpasswd",  req.http.Authorization)) {
