@@ -2,6 +2,7 @@
     Written in the format prescribed by https://github.com/Financial-Times/runbook.md.
     Any future edits should abide by this format.
 -->
+
 # UPP - Delivery Varnish
 
 Delivery varnish is the main entry point in the delivery cluster. It performs authentication when needed, caching, and routes traffic to the cluster's applications.
@@ -12,7 +13,7 @@ delivery-varnish
 
 ## Primary URL
 
-https://upp-prod-delivery-glb.upp.ft.com/
+<https://github.com/Financial-Times/delivery-varnish>
 
 ## Service Tier
 
@@ -29,6 +30,8 @@ AWS
 ## Architecture
 
 Varnish is the entry point for Delivery clusters. Service is having few main functions - authentification/reverse proxy/cache/load-balancing for services in the Delivery clusters. This varnish instance is performing static routing primary, but for dynamic routing is referred to Path Routing Varnish service. In this service is also located DNS registration job for main URL of the cluster. After authentification this service will route the request to the needed service.
+
+[Content Publishing Diagram](https://lucid.app/lucidchart/5f4f1a8b-2d62-4fb3-a605-b54d52ba7ddb/edit?view_items=_riE.MQN~Dcv&invitationId=inv_2d591f1a-d6df-4d98-8c33-3b74c4feaa37)
 
 ## Contains Personal Data
 
@@ -106,8 +109,8 @@ There are no keys for rotation.
 
 ## Monitoring
 
-*   <https://upp-prod-delivery-us.upp.ft.com/__health>
-*   <https://upp-prod-delivery-eu.upp.ft.com/__health>
+- <https://upp-prod-delivery-us.upp.ft.com/__health>
+- <https://upp-prod-delivery-eu.upp.ft.com/__health>
 
 ## First Line Troubleshooting
 
