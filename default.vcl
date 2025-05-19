@@ -236,6 +236,11 @@ backend concept_suggestions_api {
   .port = "8080";
 }
 
+backend enriched_content_read_postgres {
+  .host = "enriched-content-read-postgres";
+  .port = "8080";
+}
+
 backend cm_content_tree_api {
   .host = "cm-content-tree-api";
   .port = "8080";
@@ -445,6 +450,9 @@ sub vcl_recv {
             set req.backend_hint = public_content_relation_api;
     } elif (req.url ~ "^\/ontotext\/suggestions\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\/details.*$") {
             set req.backend_hint = concept_suggestions_api;
+    } elif (req.url ~ "^\/content\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\/internal.*$") {
+            set req.url = regsub(req.url, "^/content/(.*)$", "/\1");
+            set req.backend_hint = enriched_content_read_postgres;
     } elseif (req.url ~ "\/content-tree\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}.*$") {
             set req.backend_hint = cm_content_tree_api;
     }
