@@ -443,6 +443,9 @@ sub vcl_recv {
     } else if (req.url ~ "^\/concept\/lists.*$") {
             set req.url = regsub(req.url, "^\/concept\/lists\/(.*)$", "/\1");
             set req.backend_hint = cm_concept_lists_api;
+    } elif (req.url ~ "^\/content\/query\/filter($|\?.*|\/.*$)") {
+            set req.url = regsub(req.url, "^\/content\/query\/filter($|\?.*|\/.*$)", "/filter\1");
+            set req.backend_hint = cm_search_api;
     } elif (req.url ~ "^\/content\/query($|\?.*|\/.*$)") {
             set req.url = regsub(req.url, "^\/content\/query($|\?.*|\/.*$)", "/query\1");
             set req.backend_hint = cm_search_api;
