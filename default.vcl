@@ -276,6 +276,14 @@ sub vcl_hash {
 }
 
 sub vcl_recv {
+    # Request logging (VSL). View with varnishlog/varnishncsa as needed.
+    std.log("req method=" + req.method
+        + " url=" + req.url
+        + " xpolicy=" + req.http.X-Policy
+        + " ua=" + req.http.User-Agent
+        + " ct=" + req.http.Content-Type
+        + " cl=" + req.http.Content-Length);
+
     # Remove all cookies; we don't need them, and setting cookies bypasses varnish caching.
     # Skip removal for /ccf and /portal, the backend needs cookies for authentication
     if ((req.url !~ "^\/ccf\/") && (req.url !~ "^\/portal\/")) {
