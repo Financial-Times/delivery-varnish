@@ -542,6 +542,7 @@ sub vcl_deliver {
     # response to the client.
     #
     # You can do accounting or modifying the final object here.
+    set resp.http.Cache-Control = "max-age=0";
     if (obj.hits > 0) {
         set resp.http.X-Cache = "HIT";
     } else {
