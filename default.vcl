@@ -206,6 +206,11 @@ backend upp_schema_reader {
   .port = "8080";
 }
 
+backend core_search_api {
+  .host = "core-search-api";
+  .port = "8080";
+}
+
 backend cm_metadata_quality_api {
   .host = "cm-metadata-quality-api";
   .port = "8080";
@@ -432,9 +437,12 @@ sub vcl_recv {
             set req.url = "/validate";
             set req.backend_hint = upp_custom_code_component_validator;
         } else if (req.http.Content-Type ~ "^application\/vnd\.ft-upp-custom-code-component-internal\+json.*$") {
-	    set req.url = "/validate";
+	        set req.url = "/validate";
             set req.backend_hint = upp_internal_custom_code_component_validator;
-	}
+	    }
+    } elseif (req.url ~ "^\/search.*$") {
+        set req.url = regsub(req.url, "^\/search\/(.*)$", "/\1");
+        set req.backend_hint = core_search_api;
     } elseif (req.url ~ "^\/schemas.*$") {
             set req.backend_hint = upp_schema_reader;
     } elseif (req.url ~ "^\/metadata-quality.*$") {
