@@ -530,9 +530,6 @@ sub vcl_backend_response {
 }
 
 sub vcl_deliver {
-    # We explicitly disable any client set caching.
-    set resp.http.Cache-Control = "max-age=0, must-revalidate";
-
     # Happens when we have all the pieces we need, and are about to send the
     # response to the client.
     #
