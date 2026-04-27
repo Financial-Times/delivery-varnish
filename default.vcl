@@ -548,6 +548,10 @@ sub vcl_deliver {
         set resp.http.X-Cache = "MISS";
     }
 
+    if (req.url ~ "^/(people|organisations|things|brands|concordances)(/|\\?|$)") {
+        unset resp.http.Cache-Control;
+    }
+
     # CORS response for smartlogic widget
     if (req.http.Origin == "https://cloud.smartlogic.com" && req.url ~ "(\/content.*|\/concept\/search.*|\/concordances.*)") {
         set resp.http.Access-Control-Allow-Origin = req.http.Origin;
