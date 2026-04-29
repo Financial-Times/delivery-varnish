@@ -6,6 +6,8 @@ shutdown() {
 	log "Stopped varnishd $?"
 	pkill varnishncsa
 	log "Stopped varnishncsa $?"
+	pkill varnishlog
+	log "Stopped varnishlog $?"
        	exit 0
 }
 
@@ -21,6 +23,7 @@ varnishd -pvcc_allow_inline_c=true -f /etc/varnish/default.vcl -s malloc,1024m -
 sleep 4
 
 varnishncsa -F '%{X-Forwarded-For}i %u %{%d/%b/%Y:%T}t %U%q %s %D "%{User-Agent}i" transaction_id=%{X-Request-Id}i request_origin=%{Origin}i response_origin=%{Origin}o %{Varnish:handling}x' &
+varnishlog -g request -i ReqHeader,RespHeader &
 log "Started"
 
 #
