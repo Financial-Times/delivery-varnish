@@ -548,7 +548,11 @@ sub vcl_deliver {
         set resp.http.X-Cache = "MISS";
     }
 
-    if (req.url ~ "^/(people|organisations|things|brands|concordances)(/|\\?|$)") {
+    if (
+        (req.url ~ "^/(people|organisations|things|brands|concordances)(/|\\?|$)") || #public-people-api, public-organisations-api, public-things-api, public-brands-api, public-concordances-api
+        (req.url ~ "^/content\?isAnnotatedBy=[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}") || #public-content-by-concept-api
+        (req.url ~ "^/content/[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}/annotations") #public-annotations-api
+    ) {
         unset resp.http.Cache-Control;
     }
 
