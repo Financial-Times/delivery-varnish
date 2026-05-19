@@ -307,7 +307,7 @@ sub vcl_recv {
     set req.url = regsub(req.url, "^\/+(.*)$","/\1");
 
     // Allow /ccf and /portal to pass without requiring auth. They have authentication of their own.
-    if ((req.url ~ "^\/ccf\/") || (req.url ~ "^\/portal\/$") || (req.url ~ "^\/portal\/specs\/") || (req.url ~ "^\/portal\/api\/") || (req.url ~ "^\/portal\/filters") || (req.url ~ "^\/portal\/.+(\/|\.ico|\.css|\.html|\.js|\.js\.map|\.json|\.png|\.seq|\.sh|\.sq|\.txt|\.xml)$") || (req.url ~ "^\/portal\/(docs.*|concepts|swagger|query-builder)$")) {
+    if ((req.url ~ "^\/ccf\/") || (req.url ~ "^\/portal\/$") || (req.url ~ "^\/portal\/login(\?.*)?$") || (req.url ~ "^\/authorization-code\/callback(\?.*)?$") || (req.url ~ "^\/portal\/authorization-code\/callback(\?.*)?$") || (req.url ~ "^\/portal\/specs\/") || (req.url ~ "^\/portal\/api\/") || (req.url ~ "^\/portal\/filters") || (req.url ~ "^\/portal\/.+(\/|\.ico|\.css|\.html|\.js|\.js\.map|\.json|\.png|\.seq|\.sh|\.sq|\.txt|\.xml)$") || (req.url ~ "^\/portal\/(docs.*|concepts|swagger|query-builder)$")) {
         set req.backend_hint = internal_apps_routing_varnish;
         return (pipe);
     }
@@ -546,6 +546,14 @@ sub vcl_deliver {
         set resp.http.X-Cache = "HIT";
     } else {
         set resp.http.X-Cache = "MISS";
+    }
+
+    if (
+        (req.url ~ "^/(people|organisations|things|brands|concordances)(/|\\?|$)") || #public-people-api, public-organisations-api, public-things-api, public-brands-api, public-concordances-api
+        (req.url ~ "^/content\?isAnnotatedBy=[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}") || #public-content-by-concept-api
+        (req.url ~ "^/content/[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}/annotations") #public-annotations-api
+    ) {
+        unset resp.http.Cache-Control;
     }
 
     # CORS response for smartlogic widget
