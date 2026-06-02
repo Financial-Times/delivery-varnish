@@ -464,7 +464,7 @@ sub vcl_recv {
     } elif (req.url ~ "^\/content\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\/internal.*$") {
             set req.url = regsub(req.url, "^/content/(.*)$", "/\1");
             set req.backend_hint = enriched_content_read_postgres;
-    } elseif (req.url ~ "\/content-tree\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}.*$") {
+    } elseif (req.url ~ "\/content-tree\/.*$") {
             set req.backend_hint = cm_content_tree_api;
     }
 
