@@ -370,6 +370,14 @@ sub vcl_recv {
         # pass preserves streaming (the response is not cached) while allowing
         # Varnish to manage the backend request as HTTP and to close it when it
         # observes that the downstream client has disconnected.
+        #
+        # send_timeout defaults to ten minutes and limits the *total* lifetime
+        # of an ordinary HTTP/1 response. SSE streams are intentionally
+        # long-lived and stay active through 30-second heartbeats, so disable
+        # that lifetime limit only for these endpoints. A real client close is
+        # still propagated to the backend; a silent network loss is detected
+        # when a later heartbeat cannot be delivered.
+        set sess.send_timeout = never;
         return (pass);
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
         set req.backend_hint = public_content_by_concept_api;
