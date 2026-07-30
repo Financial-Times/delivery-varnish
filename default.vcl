@@ -373,11 +373,14 @@ sub vcl_recv {
         #
         # send_timeout defaults to ten minutes and limits the *total* lifetime
         # of an ordinary HTTP/1 response. SSE streams are intentionally
-        # long-lived and stay active through 30-second heartbeats, so disable
-        # that lifetime limit only for these endpoints. A real client close is
-        # still propagated to the backend; a silent network loss is detected
-        # when a later heartbeat cannot be delivered.
-        set sess.send_timeout = never;
+        # long-lived and stay active through 30-second heartbeats, so extend
+        # that lifetime only for these endpoints. Vinyl accepts `never` only
+        # for its global daemon parameter, not a per-request VCL variable;
+        # 100 years is consequently the route-scoped, effectively unlimited
+        # setting. A real client close is still propagated to the backend; a
+        # silent network loss is detected when a later heartbeat cannot be
+        # delivered.
+        set sess.send_timeout = 100y;
         return (pass);
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
         set req.backend_hint = public_content_by_concept_api;
