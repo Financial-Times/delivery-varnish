@@ -15,21 +15,36 @@ backend default {
 backend content_notifications_push {
   .host = "notifications-push";
   .port = "8599";
+  # Notifications Push sends its first SSE heartbeat immediately and then one
+  # every 30 seconds. These limits keep a broken backend from holding a client
+  # request forever, while leaving enough time for the expected heartbeat.
+  .connect_timeout = 5s;
+  .first_byte_timeout = 15s;
+  .between_bytes_timeout = 45s;
 }
 
 backend list_notifications_push {
   .host = "list-notifications-push";
   .port = "8599";
+  .connect_timeout = 5s;
+  .first_byte_timeout = 15s;
+  .between_bytes_timeout = 45s;
 }
 
 backend page_notifications_push {
   .host = "page-notifications-push";
   .port = "8599";
+  .connect_timeout = 5s;
+  .first_byte_timeout = 15s;
+  .between_bytes_timeout = 45s;
 }
 
 backend annotation_notifications_push {
   .host = "annotation-notifications-push";
   .port = "8599";
+  .connect_timeout = 5s;
+  .first_byte_timeout = 15s;
+  .between_bytes_timeout = 45s;
 }
 
 backend health_check_service {
@@ -348,7 +363,14 @@ sub vcl_recv {
         } elseif (req.url ~ "^\/content\/notifications-push.*$") {
             set req.backend_hint = content_notifications_push;
         }
-        return (pipe);
+        # SSE is an HTTP response, not a protocol upgrade.  Do not use pipe
+        # mode here: it bypasses Varnish's normal backend-response lifecycle
+        # and the HTTP byte timeouts above are unavailable in that mode.
+        #
+        # pass preserves streaming (the response is not cached) while allowing
+        # Varnish to manage the backend request as HTTP and to close it when it
+        # observes that the downstream client has disconnected.
+        return (pass);
     } elseif (req.url ~ "\/content\?.*isAnnotatedBy=.*") {
         set req.backend_hint = public_content_by_concept_api;
     } elseif (req.url ~ "\/content\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\/relations.*$") {
@@ -513,13 +535,13 @@ sub vcl_backend_response {
     #
     # Here you clean the response headers, removing silly Set-Cookie headers
     # and other mistakes your backend does.
-    if (((beresp.status == 500) || (beresp.status == 502) || (beresp.status == 503) || (beresp.status == 504)) && (bereq.method == "GET" ) && ((beresp.backend.name != health_check_service) || (beresp.backend.name != health_check_service-second))) {
+    if (((beresp.status == 500) || (beresp.status == 502) || (beresp.status == 503) || (beresp.status == 504)) && (bereq.method == "GET" ) && ((beresp.backend != health_check_service) && (beresp.backend != health_check_service-second))) {
         if (bereq.retries < 2 ) {
             return(retry);
         }
     }
 
-    if (((beresp.status == 500) || (beresp.status == 502) || (beresp.status == 503) || (beresp.status == 504)) && (bereq.method == "GET" ) && ((beresp.backend.name == health_check_service) || (beresp.backend.name == health_check_service-second))) {
+    if (((beresp.status == 500) || (beresp.status == 502) || (beresp.status == 503) || (beresp.status == 504)) && (bereq.method == "GET" ) && ((beresp.backend == health_check_service) || (beresp.backend == health_check_service-second))) {
         saintmode.blacklist(7s);
         return(retry);
         #if (bereq.retries < 2 ) {
