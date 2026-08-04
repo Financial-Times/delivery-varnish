@@ -563,7 +563,9 @@ sub vcl_deliver {
         set resp.http.Access-Control-Allow-Headers = "*";
     }
     if (resp.http.Vary) {
-        set resp.http.Vary = resp.http.Vary + ",Origin";
+        if (resp.http.Vary !~ "(?i)(^|,)[ ]*Origin[ ]*(,|$)") {
+            set resp.http.Vary = resp.http.Vary + ", Origin";
+        }
     } else {
         set resp.http.Vary = "Origin";
     }
