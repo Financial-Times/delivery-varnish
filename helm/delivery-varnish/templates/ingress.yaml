@@ -9,7 +9,6 @@ metadata:
     visualize: "true"
     hasHealthcheck: "{{ .Values.service.hasHealthcheck }}"
   annotations:
-    kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: "{{ .Values.alb.scheme }}"
     alb.ingress.kubernetes.io/target-type: "{{ .Values.alb.targetType }}"
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
@@ -23,6 +22,7 @@ metadata:
     external-dns.alpha.kubernetes.io/hostname: "{{ .Values.service.external_dns_hostname }}"
     external-dns.alpha.kubernetes.io/ttl: "30"
 spec:
+  ingressClassName: alb
   rules:
     - host: {{ .Values.service.external_dns_hostname }}
       http:
