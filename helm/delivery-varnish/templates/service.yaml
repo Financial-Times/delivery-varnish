@@ -10,25 +10,11 @@ metadata:
     app: {{.Values.service.name}}
     visualize: "true"
     hasHealthcheck: "{{ .Values.service.hasHealthcheck }}"
-  annotations:
-    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "{{ .Values.service.certificateAwsArn }}"
-    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
-    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
-    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "{{ .Values.elb.tags }}"
-    {{- if eq .Values.s3.enabled "true" }}
-    service.beta.kubernetes.io/aws-load-balancer-access-log-enabled: "{{ .Values.s3.enabled }}"
-    service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-name: "{{ .Values.s3.bucketName }}"
-    service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-prefix: "{{ .Values.s3.prefix }}"
-    service.beta.kubernetes.io/aws-load-balancer-access-log-emit-interval: "{{ .Values.s3.interval }}"
-    {{- end }}
-    external-dns: enabled
-    external-dns.alpha.kubernetes.io/hostname: "{{.Values.service.external_dns_hostname}}"
-    external-dns.alpha.kubernetes.io/ttl: "30"
 
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
-    - port: 443
+    - port: 80
       targetPort: 80
   selector:
     app: {{ .Values.service.name }}
