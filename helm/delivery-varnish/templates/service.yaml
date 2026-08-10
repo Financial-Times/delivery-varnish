@@ -12,7 +12,7 @@ metadata:
     hasHealthcheck: "{{ .Values.service.hasHealthcheck }}"
 
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
     - port: 80
       targetPort: 80

@@ -9,7 +9,7 @@ service:
   external_dns_hostname: ""
 alb:
   scheme: internet-facing
-  targetType: instance
+  targetType: ip
 elb:
   tags: ""
 replicaCount: 2
