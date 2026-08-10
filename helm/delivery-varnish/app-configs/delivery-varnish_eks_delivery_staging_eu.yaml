@@ -6,3 +6,6 @@ service:
 
 elb:
   tags: "systemCode=upp,teamDL=universal.publishing.platform@ft.com,environment=t"
+
+ingress:
+  subnets: subnet-0428424ddabda6a91,subnet-0eee0c86fe72591d8,subnet-0accd8698c74349ce
