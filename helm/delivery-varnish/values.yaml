@@ -9,14 +9,9 @@ service:
   external_dns_hostname: ""
 alb:
   scheme: internet-facing
-  targetType: ip
+  targetType: instance
 elb:
   tags: ""
-s3:
-  enabled: "false"
-  bucketName: ""
-  prefix: ""
-  interval: "5"
 replicaCount: 2
 image:
   repository: coco/delivery-varnish
