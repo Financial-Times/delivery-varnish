@@ -15,9 +15,6 @@ metadata:
     alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.service.certificateAwsArn }}"
     alb.ingress.kubernetes.io/backend-protocol: HTTP
     alb.ingress.kubernetes.io/tags: "{{ .Values.elb.tags }}"
-    {{- if eq .Values.s3.enabled "true" }}
-    alb.ingress.kubernetes.io/load-balancer-attributes: "access_logs.s3.enabled=true,access_logs.s3.bucket={{ .Values.s3.bucketName }},access_logs.s3.prefix={{ .Values.s3.prefix }}"
-    {{- end }}
     external-dns: enabled
     external-dns.alpha.kubernetes.io/hostname: "{{ .Values.service.external_dns_hostname }}"
     external-dns.alpha.kubernetes.io/ttl: "30"
