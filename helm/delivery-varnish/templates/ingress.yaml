@@ -37,3 +37,15 @@ spec:
                 name: {{ .Values.service.name }}
                 port:
                   number: 80
+{{- range .Values.service.additionalHostnames }}
+    - host: {{ . }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $.Values.service.name }}
+                port:
+                  number: 80
+{{- end }}
