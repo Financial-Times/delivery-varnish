@@ -9,10 +9,6 @@ metadata:
     visualize: "true"
     hasHealthcheck: "{{ .Values.service.hasHealthcheck }}"
   annotations:
-{{- if .Values.healthcheck.allowedSourceCidrs }}
-    alb.ingress.kubernetes.io/group.name: "{{ .Values.service.name }}-healthcheck"
-    alb.ingress.kubernetes.io/group.order: "100"
-{{- end }}
     alb.ingress.kubernetes.io/scheme: "{{ .Values.alb.scheme }}"
     alb.ingress.kubernetes.io/target-type: "{{ .Values.alb.targetType }}"
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
@@ -52,76 +48,4 @@ spec:
                 name: {{ $.Values.service.name }}
                 port:
                   number: 80
-{{- end }}
-{{- if .Values.healthcheck.allowedSourceCidrs }}
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: {{ .Values.service.name }}-health-allow
-  annotations:
-    alb.ingress.kubernetes.io/group.name: "{{ .Values.service.name }}-healthcheck"
-    alb.ingress.kubernetes.io/group.order: "10"
-    alb.ingress.kubernetes.io/conditions.{{ .Values.service.name }}: >
-      [{"field":"source-ip","sourceIpConfig":{"values":{{ .Values.healthcheck.allowedSourceCidrs | toJson }}}}]
-spec:
-  ingressClassName: alb
-  rules:
-    - host: {{ .Values.service.external_dns_hostname }}
-      http:
-        paths:
-          - path: /health
-            pathType: Exact
-            backend:
-              service:
-                name: {{ .Values.service.name }}
-                port:
-                  number: 80
-{{- range .Values.service.additionalHostnames }}
-    - host: {{ . }}
-      http:
-        paths:
-          - path: /health
-            pathType: Exact
-            backend:
-              service:
-                name: {{ $.Values.service.name }}
-                port:
-                  number: 80
-{{- end }}
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: {{ .Values.service.name }}-health-deny
-  annotations:
-    alb.ingress.kubernetes.io/group.name: "{{ .Values.service.name }}-healthcheck"
-    alb.ingress.kubernetes.io/group.order: "20"
-    alb.ingress.kubernetes.io/actions.health-deny: >
-      {"type":"fixed-response","fixedResponseConfig":{"contentType":"text/plain","statusCode":"403","messageBody":"Forbidden"}}
-spec:
-  ingressClassName: alb
-  rules:
-    - host: {{ .Values.service.external_dns_hostname }}
-      http:
-        paths:
-          - path: /health
-            pathType: Exact
-            backend:
-              service:
-                name: health-deny
-                port:
-                  name: use-annotation
-{{- range .Values.service.additionalHostnames }}
-    - host: {{ . }}
-      http:
-        paths:
-          - path: /health
-            pathType: Exact
-            backend:
-              service:
-                name: health-deny
-                port:
-                  name: use-annotation
-{{- end }}
 {{- end }}

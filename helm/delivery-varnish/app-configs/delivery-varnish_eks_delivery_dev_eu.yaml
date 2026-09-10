@@ -10,9 +10,3 @@ elb:
 
 ingress:
   subnets: subnet-07e16336ca97d0aa7,subnet-0a2ad47c8f7d6c19a,subnet-0bb68c68b18ce722c
-
-healthcheck:
-  allowedSourceCidrs:
-    - "10.169.0.0/21"
-    - "10.169.8.0/21"
-    - "10.169.16.0/21"
