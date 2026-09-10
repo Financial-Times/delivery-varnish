@@ -3,12 +3,10 @@ service:
   name: delivery-varnish
   certificateAwsArn: "arn:aws:acm:us-east-1:469211898354:certificate/58bea0ec-c4c5-4d21-9009-c086e5cac77f"
   external_dns_hostname: "upp-prod-delivery-us.upp.ft.com"
+  additionalHostnames:
+    - "upp-prod-delivery-glb.upp.ft.com"
 
 elb:
   tags: "systemCode=upp,teamDL=universal.publishing.platform@ft.com,environment=p"
-
-s3:
-  bucketName: "content-prod-elb-access-logs-us-east-1"
-  prefix: "upp-prod-delivery-us/delivery-varnish"
-  enabled: "true"
-  interval: "5"
+ingress:
+  subnets: subnet-003bf28d1ea35f2a8,subnet-0155603da425314a5,subnet-004de777f034a5540

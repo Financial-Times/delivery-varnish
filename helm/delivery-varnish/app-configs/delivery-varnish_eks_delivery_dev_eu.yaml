@@ -8,5 +8,5 @@ service:
 elb:
   tags: "systemCode=upp,teamDL=universal.publishing.platform@ft.com,environment=d"
 
-s3:
-  enabled: "false"
+ingress:
+  subnets: subnet-07e16336ca97d0aa7,subnet-0a2ad47c8f7d6c19a,subnet-0bb68c68b18ce722c
