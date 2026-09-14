@@ -17,19 +17,35 @@ metadata:
     alb.ingress.kubernetes.io/tags: "{{ .Values.elb.tags }}"
     alb.ingress.kubernetes.io/subnets: "{{ .Values.ingress.subnets }}"
     alb.ingress.kubernetes.io/ssl-redirect: '443'
+
+    # Target group health check
     alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
     alb.ingress.kubernetes.io/healthcheck-port: traffic-port
     alb.ingress.kubernetes.io/healthcheck-path: /health
     alb.ingress.kubernetes.io/success-codes: "200"
+
+    # Public requests to /health are answered by the ALB itself
+    alb.ingress.kubernetes.io/actions.block-health: >
+      {"type":"fixed-response","fixedResponseConfig":{"contentType":"text/plain","statusCode":"404","messageBody":"Not Found"}}
+
     external-dns: enabled
     external-dns.alpha.kubernetes.io/hostname: "{{ .Values.service.external_dns_hostname }}"
     external-dns.alpha.kubernetes.io/ttl: "30"
+
 spec:
   ingressClassName: alb
   rules:
     - host: {{ .Values.service.external_dns_hostname }}
       http:
         paths:
+          - path: /health
+            pathType: Exact
+            backend:
+              service:
+                name: block-health
+                port:
+                  name: use-annotation
+
           - path: /
             pathType: Prefix
             backend:
@@ -37,10 +53,19 @@ spec:
                 name: {{ .Values.service.name }}
                 port:
                   number: 80
+
 {{- range .Values.service.additionalHostnames }}
     - host: {{ . }}
       http:
         paths:
+          - path: /health
+            pathType: Exact
+            backend:
+              service:
+                name: block-health
+                port:
+                  name: use-annotation
+
           - path: /
             pathType: Prefix
             backend:
