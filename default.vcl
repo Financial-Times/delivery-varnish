@@ -571,6 +571,14 @@ sub vcl_backend_response {
         set beresp.ttl = 31536000s;
     }
 
+    # Keep core-search-api hybrid responses in their own bounded cache pool.
+    if (bereq.backend == core_search_api && bereq.method == "POST" &&
+        bereq.url ~ "^/hybrid($|\?.*)") {
+        set beresp.storage = storage.search;
+    } else {
+        set beresp.storage = storage.general;
+    }
+
     # Search API POST responses need an explicit freshness lifetime. Without
     # one, do not let Varnish's default TTL cache the response implicitly.
     if (bereq.method == "POST" && bereq.backend == core_search_api &&
