@@ -527,6 +527,12 @@ Disallow: /"});
 
 
 sub vcl_backend_fetch {
+    # Varnish changes cacheable POST requests to GET before backend fetch.
+    # Restore POST for the cached core-search-api hybrid route.
+    if (bereq.http.X-Varnish-Search-Cache == "1") {
+        set bereq.method = "POST";
+    }
+
     unset bereq.http.X-Varnish-Search-Cache;
 
     if ((bereq.backend == healthdirector.backend()) && (bereq.retries > 0)) {
