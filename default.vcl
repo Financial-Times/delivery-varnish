@@ -5,6 +5,7 @@ import basicauth;
 import std;
 import saintmode;
 import directors;
+import bodyaccess;
 
 # Default backend definition. Set this to point to your content server.
 backend default {
@@ -277,10 +278,21 @@ acl purge {
 sub vcl_hash {
     # set cache key to lowercased req.url
     hash_data(std.tolower(req.url));
+    if (req.http.X-Varnish-Search-Cache) {
+        # The response's Vary header separates header-based variants (for
+        # example X-Policy); include the body because it contains the query,
+        # filters, and advanced parameters.
+        if (req.method == "POST") {
+            bodyaccess.hash_req_body();
+        }
+    }
     return (lookup);
 }
 
 sub vcl_recv {
+    # These headers are internal cache controls and must not be client-set.
+    unset req.http.X-Varnish-Search-Cache;
+
     # Remove all cookies; we don't need them, and setting cookies bypasses varnish caching.
     # Skip removal for /ccf and /portal, the backend needs cookies for authentication
     if ((req.url !~ "^\/ccf\/") && (req.url !~ "^\/portal\/")) {
@@ -447,6 +459,9 @@ sub vcl_recv {
     } elseif (req.url ~ "^\/search.*$") {
         set req.url = regsub(req.url, "^\/search\/(.*)$", "/\1");
         set req.backend_hint = core_search_api;
+        if (req.url ~ "^\/hybrid($|\?.*)") {
+            set req.http.X-Varnish-Search-Cache = "1";
+        }
     } elseif (req.url ~ "^\/schemas.*$") {
             set req.backend_hint = upp_schema_reader;
     } elseif (req.url ~ "^\/metadata-quality.*$") {
@@ -483,6 +498,14 @@ sub vcl_recv {
         set req.backend_hint = internal_apps_routing_varnish;
         return (pipe);
     }
+
+    # Cache core-search-api /hybrid POSTs only when the body can be buffered and hashed.
+    if (req.method == "POST" && req.http.X-Varnish-Search-Cache) {
+        if (std.cache_req_body(1MB)) {
+            return (hash);
+        }
+        return (pass);
+    }
 }
 
 sub vcl_synth {
@@ -504,6 +527,14 @@ Disallow: /"});
 
 
 sub vcl_backend_fetch {
+    # Varnish changes cacheable POST requests to GET before backend fetch.
+    # Restore POST for the cached core-search-api hybrid route.
+    if (bereq.http.X-Varnish-Search-Cache == "1") {
+        set bereq.method = "POST";
+    }
+
+    unset bereq.http.X-Varnish-Search-Cache;
+
     if ((bereq.backend == healthdirector.backend()) && (bereq.retries > 0)) {
         # Get a backend from the director.
         # When returning a backend, the director will only return backends
@@ -538,6 +569,22 @@ sub vcl_backend_response {
 
     if (beresp.status == 301 && ((beresp.http.cache-control !~ "s-maxage") || (beresp.http.cache-control !~ "max-age"))){
         set beresp.ttl = 31536000s;
+    }
+
+    # Keep core-search-api hybrid responses in their own bounded cache pool.
+    if (bereq.backend == core_search_api && bereq.method == "POST" &&
+        bereq.url ~ "^/hybrid($|\?.*)") {
+        set beresp.storage = storage.search;
+    } else {
+        set beresp.storage = storage.general;
+    }
+
+    # Search API POST responses need an explicit freshness lifetime. Without
+    # one, do not let Varnish's default TTL cache the response implicitly.
+    if (bereq.method == "POST" && bereq.backend == core_search_api &&
+        beresp.http.Cache-Control !~ "(?i)(s-maxage|max-age)=" &&
+        !beresp.http.Expires) {
+        set beresp.ttl = 0s;
     }
 }
 
