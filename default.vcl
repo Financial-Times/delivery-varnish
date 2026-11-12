@@ -237,6 +237,11 @@ backend relations-api {
   .port = "8080";
 }
 
+backend public-annotations-api {
+  .host = "public-annotations-api";
+  .port = "8080";
+}
+
 backend concept_suggestions_api {
   .host = "concept-suggestion-writer-postgres";
   .port = "8080";
@@ -369,6 +374,8 @@ sub vcl_recv {
         set req.backend_hint = public_content_by_concept_api;
     } elseif (req.url ~ "\/content\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\/relations.*$") {
         set req.backend_hint = relations-api;
+    } elseif (req.url ~ "\/content\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\/annotations.*$") {
+        set req.backend_hint = public-annotations-api;
     } elseif (req.url ~ "\/concept\/search.*$") {
         set req.backend_hint = concept_search_api;
     } elseif (req.url ~ "^\/concepts\?.*$") {
